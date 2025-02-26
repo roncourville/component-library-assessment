@@ -36,6 +36,12 @@ export default function Page() {
   const [isLoadingUsers, setIsLoadingUsers] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
+  useEffect(() => {
+    //only run on client
+    localStorage.theme = "light";
+  }, []);
+
+
   // Fetch plasmids from Supabase
   useEffect(() => {
     const loadPlasmids = async () => {
