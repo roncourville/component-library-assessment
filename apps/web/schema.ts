@@ -12,7 +12,6 @@ export interface ColumnDefinition {
   fixedWidth?: string
   dbField?: string // Added field to map to Supabase column name
   config: ColumnType
-  isLoadingUsers?: boolean
 }
 
 export const gridSchema = {

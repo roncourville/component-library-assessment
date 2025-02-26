@@ -13,6 +13,7 @@ interface CellRendererProps {
   isEditing?: boolean
   onCellChange?: (rowId: string, key: string, value: any) => void
   plasmidOptions?: string[]
+  isLoadingUsers?: boolean
 }
 
 export function CellRenderer({

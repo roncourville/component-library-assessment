@@ -41,7 +41,7 @@ export default function Page() {
     const loadPlasmids = async () => {
       setIsLoading(true)
       try {
-        const plasmids = await fetchPlasmids()
+        const plasmids = await fetchPlasmids() as Plasmid[]
         setData(plasmids)
       } catch (error) {
         console.error("Error fetching plasmids:", error)

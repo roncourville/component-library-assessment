@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-import DataGrid from '../app/datagrid/data-grid';
+import DataGrid from '../data-grid';
 import type { User } from '../components/assignees';
 
 const meta: Meta<typeof DataGrid> = {
