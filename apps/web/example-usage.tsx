@@ -1,12 +1,11 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import DataGrid from "../data-grid"
-import type { User } from "../components/assignees"
-import { toast } from "@workspace/ui/hooks/use-toast"
+import DataGrid from "./data-grid"
+import type { User } from "./components/assignees"
+import { toast } from "@workspace/ui/components/use-toast"
 import { Toaster } from "@workspace/ui/components/toaster"
-import { fetchPlasmids, fetchUsers, addPlasmid, updatePlasmid, deletePlasmid } from "../lib/supabase-utils"
-import "./globals.css"
+import { fetchPlasmids, fetchUsers, addPlasmid, updatePlasmid, deletePlasmid } from "./lib/supabase-utils"
 
 const plasmidOptions = [
   "GT-plasmids-1: lentiCRISPR v2",

@@ -6,8 +6,10 @@ const config = {
   darkMode: ["class"],
   content: [
     "app/**/*.{ts,tsx}",
+    "../../apps/web/**/*.{ts,tsx}",
     "components/**/*.{ts,tsx}",
     "../../packages/ui/src/components/**/*.{ts,tsx}",
+    "./stories/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
     extend: {
