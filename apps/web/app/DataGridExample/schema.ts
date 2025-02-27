@@ -1,20 +1,7 @@
-// export type ColumnType =
-//   | { type: "link"; baseUrl: string }
-//   | { type: "tag" }
-//   | { type: "number"; unit?: string }
-//   | { type: "text" }
-//   | { type: "user"; multiple?: boolean }
+import { GridSchema } from '@workspace/ui/components/DataGrid/types';
 
-// export interface ColumnDefinition {
-//   key: string
-//   header: string
-//   width?: string
-//   fixedWidth?: string
-//   dbField?: string // Added field to map to Supabase column name
-//   config: ColumnType
-// }
-
-export const gridSchema = {
+export const gridSchema: GridSchema = {
+  uniqueKey: "id",
   columns: [
     {
       key: "id",
@@ -78,5 +65,4 @@ export const gridSchema = {
       },
     },
   ],
-} as const
-
+};

@@ -1,17 +1,20 @@
 "use client"
 
-import * as React from "react"
+import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table"
-import { Button } from "@workspace/ui/components/button"
+
 import { Checkbox } from "@workspace/ui/components/checkbox"
 import { ArrowDown, ArrowUp, Pencil, Plus, Save, Trash2 } from "lucide-react"
-import { CellRenderer } from "./cell-renderer"
-import { gridSchema } from "./schema"
-import type { User } from "./components/assignees"
+import DataRow from './DataRow';
+import { json } from 'stream/consumers';
+
+import { Button } from "@workspace/ui/components/button"
+//import type { User } from "./components/assignees"
 import { Input } from "@workspace/ui/components/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select"
 import { toast } from "@workspace/ui/hooks/use-toast"
-import type { Plasmid } from "./lib/supabase-utils"
+//import type { Plasmid } from "./lib/supabase-utils"
+
 
 interface DataGridProps {
   data: Record<string, any>[]
@@ -22,7 +25,10 @@ interface DataGridProps {
   onDelete?: (rowId: string) => void
   isLoadingUsers?: boolean
   isLoading?: boolean
+  gridSchema: any
+  onEdit?: any
 }
+
 
 type SortDirection = "asc" | "desc" | null
 type SortConfig = {
@@ -31,15 +37,20 @@ type SortConfig = {
   priority: number
 }
 
+
 export default function DataGrid({
   data,
-  allUsers = [],
-  plasmidOptions = [],
+  isLoading,
+  onEdit,
+  onDelete,
+  // searchTerm,
+  gridSchema,
+  allUsers,
+  plasmidOptions,
+
   onAdd,
   onUpdate,
-  onDelete,
   isLoadingUsers = false,
-  isLoading = false,
 }: DataGridProps) {
   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set())
   const [editingRows, setEditingRows] = React.useState<Set<string>>(new Set())
@@ -424,72 +435,26 @@ export default function DataGrid({
           </TableHeader>
           <TableBody>
             {filteredData.map((row) => (
-              <TableRow key={row.id} className="hover:bg-gray-50">
-                <TableCell>
-                  <Checkbox
-                    checked={selectedRows.has(row.id)}
-                    onCheckedChange={() => toggleRow(row.id)}
-                    className="checkbox-stripe"
-                  />
-                </TableCell>
-                {gridSchema.columns.map((column) => (
-                  <TableCell
-                    key={column.key}
-                    onClick={() => handleCellClick(row.id, column.key)}
-                    onBlur={() => handleCellBlur(row.id, column.key)}
-                    className="group relative hover:outline hover:outline-1 hover:outline-gray-200"
-                    style={{ width: column.fixedWidth }}
-                  >
-                    <div className="rounded outline-offset-0">
-                      <CellRenderer
-                        column={column}
-                        value={rowEdits[row.id]?.[column.key] ?? row[column.key]}
-                        row={row}
-                        allUsers={allUsers}
-                        isEditing={isEditing(row.id, column.key)}
-                        onCellChange={handleCellChange}
-                        plasmidOptions={plasmidOptions}
-                        isLoadingUsers={isLoadingUsers}
-                      />
-                    </div>
-                  </TableCell>
-                ))}
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {editingRows.has(row.id) ? (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleSaveRow(row.id)}
-                        disabled={isLoading}
-                        className="text-[#635bff] hover:bg-purple-50"
-                      >
-                        <Save className="h-4 w-4" />
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEditRow(row.id)}
-                        disabled={isLoading}
-                        className="text-[#635bff] hover:bg-purple-50"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => onDelete?.(row.id)}
-                      disabled={isLoading}
-                      className="text-red-500 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </TableCell>
-              </TableRow>
+
+              gridSchema.columns.map((column) => (
+                <DataRow
+                  key={row[gridSchema.uniqueKey]}
+                  row={row}
+                  isLoading={isLoading}
+                  onEdit={onEdit}
+                  onDelete={onDelete}
+                  columns={gridSchema.columns}
+                  isChecked={selectedRows.has(row.id)}
+                  toggleRow={setSelectedRows}
+                  plasmidOptions={plasmidOptions}
+                  allUsers={allUsers}
+                  //isEditing={isEditing(row.id, column.key)}
+                  isEditing={editingRows.has(row.id)}
+                />
+              ))
             ))}
+
+
             {filteredData.length === 0 && (
               <TableRow>
                 <TableCell colSpan={gridSchema.columns.length + 2} className="h-24 text-center text-gray-500">
@@ -497,6 +462,7 @@ export default function DataGrid({
                 </TableCell>
               </TableRow>
             )}
+
           </TableBody>
         </Table>
       </div>
@@ -504,3 +470,217 @@ export default function DataGrid({
   )
 }
 
+
+//   const [sortConfigs, setSortConfigs] = React.useState<SortConfig[]>([
+//     { key: "id", direction: "asc", priority: 1 }, // Default sort is ASC on ID
+//   ])
+//   const [searchTerm, setSearchTerm] = React.useState("")
+//   const [searchField, setSearchField] = React.useState("all")
+//   const [selectedRows, setSelectedRows] = React.useState<Set<string>>(new Set())
+
+
+//   const [editingRows, setEditingRows] = React.useState<Set<string>>(new Set())
+//   const [editingCell, setEditingCell] = React.useState<{ rowId: string; key: string } | null>(null)
+//   const [rowEdits, setRowEdits] = React.useState<Record<string, Record<string, any>>>({})
+
+//   const toggleAll = (checked: boolean) => {
+//     if (checked) {
+//       setSelectedRows(new Set(data.map((row) => row.id)))
+//     } else {
+//       setSelectedRows(new Set())
+//     }
+//   }
+
+//   const isEditing = (rowId: string, key: string) => {
+//     return editingRows.has(rowId) || (editingCell?.rowId === rowId && editingCell?.key === key)
+//   }
+
+//   const handleEditRow = (rowId: string) => {
+//     setEditingRows((prev) => new Set(prev).add(rowId))
+//     // Initialize row edits with current values
+//     const currentRow = data.find((row) => row.id === rowId)
+//     if (currentRow) {
+//       setRowEdits((prev) => ({
+//         ...prev,
+//         [rowId]: { ...currentRow },
+//       }))
+//     }
+//   }
+
+//   // Handle column sort
+//   const handleSort = (key: string) => {
+//     setSortConfigs((prevConfigs) => {
+//       // Find if this column is already being sorted
+//       const existingConfigIndex = prevConfigs.findIndex((config) => config.key === key)
+
+//       if (existingConfigIndex !== -1) {
+//         // Column is already being sorted, toggle direction or remove
+//         const existingConfig = prevConfigs[existingConfigIndex]
+//         const newConfigs = [...prevConfigs]
+
+//         if (existingConfig?.direction === "asc") {
+//           // Change to desc
+//           newConfigs[existingConfigIndex] = { ...existingConfig, direction: "desc" }
+//         } else if (existingConfig?.direction === "desc") {
+//           // Remove sort
+//           newConfigs.splice(existingConfigIndex, 1)
+//           // Update priorities
+//           return newConfigs.map((config, index) => ({
+//             ...config,
+//             priority: index + 1,
+//           }))
+//         }
+
+//         return newConfigs
+//       } else {
+//         // Add new sort with highest priority
+//         return [...prevConfigs, { key, direction: "asc", priority: prevConfigs.length + 1 }]
+//       }
+//     })
+//   }
+
+//   // Get sort config for a column
+//   const getSortConfig = (key: string) => {
+//     return sortConfigs.find((config) => config.key === key)
+//   }
+
+//   // Sort the data based on sort configs
+//   const sortedData = React.useMemo(() => {
+//     if (sortConfigs.length === 0) return [...data]
+
+//     // Sort by priority
+//     const sortedConfigs = [...sortConfigs].sort((a, b) => a.priority - b.priority)
+
+//     return [...data].sort((a, b) => {
+//       // Apply each sort config in order of priority
+//       for (const config of sortedConfigs) {
+//         const { key, direction } = config
+
+//         if (!direction) continue
+
+//         let valueA = a[key]
+//         let valueB = b[key]
+
+//         // Handle special cases for different column types
+//         const column = gridSchema.columns.find((col) => col.key === key)
+
+//         if (column?.config.type === "user" && Array.isArray(valueA) && Array.isArray(valueB)) {
+//           // Sort by first user's name
+//           valueA = valueA.length > 0 ? valueA[0].name : ""
+//           valueB = valueB.length > 0 ? valueB[0].name : ""
+//         }
+
+//         // Compare values
+//         if (valueA < valueB) {
+//           return direction === "asc" ? -1 : 1
+//         }
+//         if (valueA > valueB) {
+//           return direction === "asc" ? 1 : -1
+//         }
+//       }
+
+//       return 0
+//     })
+//   }, [data, sortConfigs])
+
+
+//   const filteredData = React.useMemo(() => {
+//     if (!searchTerm) return sortedData
+
+//     return sortedData.filter((row) => {
+//       if (searchField === "all") {
+//         // Search in all fields
+//         return Object.entries(row).some(([key, value]) => {
+//           // Skip id field and handle different types
+//           if (key === "id") return false
+
+//           if (key === "assignees" && Array.isArray(value)) {
+//             // For users, search in names
+//             return value.some((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
+//           }
+
+//           // For other fields, convert to string and search
+//           return String(value).toLowerCase().includes(searchTerm.toLowerCase())
+//         })
+//       } else {
+//         // Search in specific field
+//         const value = row[searchField]
+
+//         if (searchField === "assignees" && Array.isArray(value)) {
+//           // For users, search in names
+//           return value.some((user) => user.name.toLowerCase().includes(searchTerm.toLowerCase()))
+//         }
+
+//         // For other fields, convert to string and search
+//         return String(value).toLowerCase().includes(searchTerm.toLowerCase())
+//       }
+//     })
+//   }, [sortedData, searchTerm, searchField])
+
+//   return (
+// <div className="p-4">
+//       <div className="overflow-x-auto">
+//         <Table>
+//         <TableHeader className="bg-gray-50">
+//             <TableRow>
+//               <TableHead className="w-12">
+//                 <Checkbox
+//                   checked={selectedRows.size === data.length}
+//                   onCheckedChange={toggleAll}
+//                   className="checkbox-stripe"
+//                 />
+//               </TableHead>
+//               {gridSchema.columns.map((column) => (
+//                 <TableHead
+//                   key={column.key}
+//                   className={`cursor-pointer`}
+//                   style={{ width: column.fixedWidth }}
+//                   onClick={() => handleSort(column.key)}
+//                 >
+//                   <div className="flex items-center gap-1">
+//                     {column.header}
+//                     {getSortConfig(column.key)?.direction === "asc" && <ArrowUp className="h-4 w-4 text-[#635bff]" />}
+//                     {getSortConfig(column.key)?.direction === "desc" && (
+//                       <ArrowDown className="h-4 w-4 text-[#635bff]" />
+//                     )}
+//                     {getSortConfig(column.key) && (
+//                       <span className="text-xs text-gray-500 ml-1">{getSortConfig(column.key)?.priority}</span>
+//                     )}
+//                   </div>
+//                 </TableHead>
+//               ))}
+//               <TableHead className="w-[100px]">Actions</TableHead>
+//             </TableRow>
+//           </TableHeader>
+//           <TableBody>
+//             {filteredData.map((row) => (
+//               <DataRow
+//                 key={row[gridSchema.uniqueKey]}
+//                 row={row}
+//                 isLoading={isLoading}
+//                 onEdit={onEdit}
+//                 onDelete={onDelete}
+//                 columns={gridSchema.columns}
+//                 isChecked={selectedRows.has(row.id)}
+//                 toggleRow={setSelectedRows}
+//                 plasmidOptions={plasmidOptions}
+//                 allUsers={allUsers}
+//                 //isEditing={isEditing(row.id, column.key)}
+//                 isEditing={editingRows.has(row.id)}
+//               />
+//             ))}
+//             {filteredData.length === 0 && (
+//               <TableRow>
+//                 <TableCell colSpan={gridSchema.columns.length + 1} className="h-24 text-center text-gray-500">
+//                   {searchTerm ? "No results found." : "No data available."}
+//                 </TableCell>
+//               </TableRow>
+//             )}
+//           </TableBody>
+//         </Table>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default DataGrid;
