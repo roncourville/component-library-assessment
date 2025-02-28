@@ -3,7 +3,7 @@ import { Badge } from "@workspace/ui/components/badge";
 import { Input } from "@workspace/ui/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
 import Link from 'next/link';
-import { Assignees } from "@workspace/ui/components/UserPicker/UserPicker";
+import { UserPicker } from "@workspace/ui/components/UserPicker";
 import { CellComponentProps } from '../types';
 import PluginRegistry from '../PluginRegistry';
 
@@ -102,7 +102,7 @@ const TagEditor = ({ value, onChange, options, isEditing }: CellComponentProps<s
 const UserRenderer = ({ value, options }: CellComponentProps<any[]>) => {
   const users = Array.isArray(value) ? value : (value ? [value] : []);
   return (
-    <Assignees 
+    <UserPicker 
       users={options?.allUsers || []} 
       selected={users} 
       multiple={options?.multiple} 
@@ -117,7 +117,7 @@ const UserEditor = ({ value, onChange, options, isEditing }: CellComponentProps<
   console.log("UserEditor: isEditing=", isEditing, "value=", value, "options=", options);
   
   return (
-    <Assignees
+    <UserPicker
       users={options?.allUsers || []}
       selected={users}
       onChange={(newUsers) => {

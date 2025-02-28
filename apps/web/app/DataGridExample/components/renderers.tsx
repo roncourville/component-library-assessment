@@ -1,7 +1,7 @@
 import React from 'react';
 import { Badge } from "@workspace/ui/components/badge";
 import Link from 'next/link';
-import { Assignees } from "@workspace/ui/components/UserPicker";
+import { UserPicker } from "@workspace/ui/components/UserPicker";
 import { CellComponentProps } from '@workspace/ui/components/DataGrid/types';
 
 // TEXT COMPONENT
@@ -42,7 +42,7 @@ export const TagRenderer: React.FC<CellComponentProps<string>> = ({ value }) => 
 export const UserRenderer: React.FC<CellComponentProps<any[]>> = ({ value, options }) => {
   const users = Array.isArray(value) ? value : (value ? [value] : []);
   return (
-    <Assignees 
+    <UserPicker 
       users={options?.allUsers || []} 
       selected={users} 
       multiple={options?.multiple} 
@@ -57,7 +57,7 @@ export const AvatarRenderer: React.FC<CellComponentProps<{ name: string; image?:
   
   return (
     <div className="flex items-center gap-2">
-      <Assignees
+      <UserPicker
         users={[]} 
         selected={[{ id: '1', name: value.name, email: '', image: value.image }]} 
         disabled={true}

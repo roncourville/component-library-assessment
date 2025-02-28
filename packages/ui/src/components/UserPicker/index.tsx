@@ -5,4 +5,5 @@
 export * from './types';
 
 // Re-export components
-export { Assignees } from './Assignees';
+export { UserPicker } from './UserPicker';
+export type { UserPickerProps } from './UserPicker';

@@ -4,3 +4,7 @@ export interface User {
   email: string;
   image?: string;
 }
+
+export interface UserPickerState {
+  open: boolean;
+}

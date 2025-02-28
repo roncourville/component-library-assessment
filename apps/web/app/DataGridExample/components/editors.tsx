@@ -1,7 +1,7 @@
 import React from 'react';
 import { Input } from "@workspace/ui/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { Assignees } from "@workspace/ui/components/UserPicker";
+import { UserPicker } from "@workspace/ui/components/UserPicker";
 import { CellComponentProps } from '@workspace/ui/components/DataGrid/types';
 import { useUsers } from '../hooks/useUsers';
 
@@ -46,7 +46,7 @@ export const UserEditor: React.FC<CellComponentProps<any[]>> = ({ value, onChang
   const { users, isLoadingUsers } = useUsers();
   
   return (
-    <Assignees
+    <UserPicker
       users={users}
       selected={selected}
       onChange={(newUsers) => onChange?.(newUsers)}

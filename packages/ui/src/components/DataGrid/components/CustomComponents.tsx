@@ -7,7 +7,7 @@ import { Input } from "@workspace/ui/components/input";
 /**
  * Example of a custom Avatar component that displays a user's avatar
  */
-export const CustomAvatarRenderer = ({ value }: CellComponentProps<{ name: string; image?: string }>) => {
+const CustomAvatarRenderer = ({ value }: CellComponentProps<{ name: string; image?: string }>) => {
   if (!value) return null;
   
   return (
@@ -24,7 +24,7 @@ export const CustomAvatarRenderer = ({ value }: CellComponentProps<{ name: strin
 /**
  * Example of a custom editor for a color field that shows a color picker
  */
-export const ColorValueRenderer = ({ value }: CellComponentProps<string>) => {
+const ColorValueRenderer = ({ value }: CellComponentProps<string>) => {
   if (!value) return null;
   
   return (
@@ -38,7 +38,7 @@ export const ColorValueRenderer = ({ value }: CellComponentProps<string>) => {
   );
 };
 
-export const ColorValueEditor = ({ value, onChange }: CellComponentProps<string>) => {
+const ColorValueEditor = ({ value, onChange }: CellComponentProps<string>) => {
   return (
     <div className="flex items-center gap-2">
       <input
