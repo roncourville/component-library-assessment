@@ -1,7 +1,21 @@
-import { GridSchema } from '@workspace/ui/components/DataGrid/types';
+import { GridSchema } from '@workspace/ui/components/DataGrid';
+import {
+  UserRenderer,
+} from './components/renderers';
+
+import {
+  CustomTagEditor,
+  UserEditor,
+} from './components/editors';
+
+import {
+  TextRenderer, TextEditor,
+  NumberRenderer, NumberEditor, TagRenderer, LinkRenderer
+} from '@workspace/ui/components/DataGrid';
 
 export const gridSchema: GridSchema = {
   uniqueKey: "id",
+  defaultEditorMode: "inline",
   columns: [
     {
       key: "id",
@@ -9,10 +23,16 @@ export const gridSchema: GridSchema = {
       width: "w-48",
       fixedWidth: "200px",
       dbField: "id",
+      editDisabled: true,
       config: {
-        type: "link",
-        baseUrl: "/plasmids",
+        renderer: LinkRenderer,
+        editor: TextEditor,
+        options: {
+          baseUrl: "/plasmids/",
+        },
       },
+      sortable: true,
+      filterable: true,
     },
     {
       key: "plasmid",
@@ -20,8 +40,15 @@ export const gridSchema: GridSchema = {
       fixedWidth: "250px",
       dbField: "plasmid_name",
       config: {
-        type: "tag",
+        renderer: TagRenderer,
+        editor: CustomTagEditor,
+        saveEvent: "change",
+        options: {
+          placeholder: "Select plasmid"
+        },
       },
+      sortable: true,
+      filterable: true,
     },
     {
       key: "volume",
@@ -30,9 +57,14 @@ export const gridSchema: GridSchema = {
       fixedWidth: "120px",
       dbField: "volume_ul",
       config: {
-        type: "number",
-        unit: "μl",
+        renderer: NumberRenderer,
+        editor: NumberEditor,
+        options: {
+          unit: "μl",
+        },
       },
+      sortable: true,
+      filterable: true,
     },
     {
       key: "length",
@@ -41,9 +73,14 @@ export const gridSchema: GridSchema = {
       fixedWidth: "120px",
       dbField: "length_bp",
       config: {
-        type: "number",
-        unit: "bp",
+        renderer: NumberRenderer,
+        editor: NumberEditor,
+        options: {
+          unit: "bp",
+        },
       },
+      sortable: true,
+      filterable: true,
     },
     {
       key: "storageLocation",
@@ -51,8 +88,11 @@ export const gridSchema: GridSchema = {
       fixedWidth: "200px",
       dbField: "storage_location",
       config: {
-        type: "text",
+        renderer: TextRenderer,
+        editor: TextEditor,
       },
+      sortable: true,
+      filterable: true,
     },
     {
       key: "assignees",
@@ -60,9 +100,15 @@ export const gridSchema: GridSchema = {
       fixedWidth: "300px",
       dbField: "assignees",
       config: {
-        type: "user",
-        multiple: true,
+        renderer: UserRenderer,
+        editor: UserEditor,
+        saveEvent: "change",
+        options: {
+          multiple: true,
+        },
       },
+      sortable: false,
+      filterable: true,
     },
   ],
 };

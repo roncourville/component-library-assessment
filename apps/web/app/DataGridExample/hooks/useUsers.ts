@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { fetchUsers } from '../../lib/supabase-utils';
+import { fetchUsers } from '../../../lib/supabase-utils';
 import { toast } from '@workspace/ui/hooks/use-toast';
-import type { User } from '../../components/assignees';
+import type { User } from '@workspace/ui/components/UserPicker';
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);

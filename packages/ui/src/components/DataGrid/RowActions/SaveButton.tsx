@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '@workspace/ui/components/button';
-import { Save } from "lucide-react"
+import { Save } from "lucide-react";
 
 interface EditButtonProps {
   onClick: () => void;

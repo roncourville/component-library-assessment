@@ -1,5 +1,5 @@
 import { supabase } from "./supabase"
-import { gridSchema } from "../schema"
+import { gridSchema } from "../app/DataGridExample/schema"
 
 // Helper function to map data from UI format to Supabase format
 export function mapToSupabaseFormat(data: Record<string, any>): Record<string, any> {

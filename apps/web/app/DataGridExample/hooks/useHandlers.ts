@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { addPlasmid, updatePlasmid, deletePlasmid } from '../../lib/supabase-utils';
+import { addPlasmid, updatePlasmid, deletePlasmid } from '../../../lib/supabase-utils';
 import { toast } from '@workspace/ui/hooks/use-toast';
+import type { Plasmid } from '../../types/data.types';
 
 export function useHandlers(setData: React.Dispatch<React.SetStateAction<Plasmid[]>>) {
   const [isLoading, setIsLoading] = useState(false);

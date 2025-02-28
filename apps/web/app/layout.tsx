@@ -1,8 +1,21 @@
 import { Geist, Geist_Mono } from "next/font/google"
 
-import "@workspace/ui/globals.css"
-import { Providers } from "@/components/providers"
+import "@workspace/ui/styles/globals.css"
+import { ThemeProvider as NextThemesProvider } from "next-themes"
 
+function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <NextThemesProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+      enableColorScheme
+    >
+      {children}
+    </NextThemesProvider>
+  )
+}
 const fontSans = Geist({
   subsets: ["latin"],
   variable: "--font-sans",

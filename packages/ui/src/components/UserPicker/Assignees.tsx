@@ -1,29 +1,23 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover"
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@workspace/ui/components/command"
-import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar"
-import { Button } from "@workspace/ui/components/button"
-import { Check, X } from "lucide-react"
-import { Badge } from "@workspace/ui/components/badge"
-import { Loader2 } from "lucide-react"
+import * as React from "react";
+import { Popover, PopoverContent, PopoverTrigger } from "@workspace/ui/components/popover";
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@workspace/ui/components/command";
+import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
+import { Button } from "@workspace/ui/components/button";
+import { Check, X } from "lucide-react";
+import { Badge } from "@workspace/ui/components/badge";
+import { Loader2 } from "lucide-react";
+import { User } from "./types";
 
-export interface User {
-  id: string
-  name: string
-  email: string
-  image?: string
-}
-
-interface AssigneesProps {
-  users?: User[]
-  selected?: User[]
-  onChange?: (users: User[]) => void
-  multiple?: boolean
-  disabled?: boolean
-  isEditing?: boolean
-  isLoading?: boolean
+export interface AssigneesProps {
+  users?: User[];
+  selected?: User[];
+  onChange?: (users: User[]) => void;
+  multiple?: boolean;
+  disabled?: boolean;
+  isEditing?: boolean;
+  isLoading?: boolean;
 }
 
 export function Assignees({
@@ -35,31 +29,38 @@ export function Assignees({
   isEditing = false,
   isLoading = false,
 }: AssigneesProps) {
-  const [open, setOpen] = React.useState(false)
-  const firstUser = selected[0]
-  const remainingUsers = selected.slice(1)
-  const remainingCount = remainingUsers.length
+  const [open, setOpen] = React.useState(false);
+  const firstUser = selected[0];
+  const remainingUsers = selected.slice(1);
+  const remainingCount = remainingUsers.length;
 
   const handleSelect = (user: User) => {
-    if (!onChange || disabled) return
+    if (!onChange || disabled) return;
 
+    console.log("UserPicker: handleSelect", user);
+    
     if (multiple) {
-      const isSelected = selected.some((s) => s.id === user.id)
+      const isSelected = selected.some((s) => s.id === user.id);
       if (isSelected) {
-        onChange(selected.filter((s) => s.id !== user.id))
+        console.log("UserPicker: removing user", user);
+        onChange(selected.filter((s) => s.id !== user.id));
       } else {
-        onChange([...selected, user])
+        console.log("UserPicker: adding user", user);
+        onChange([...selected, user]);
       }
     } else {
-      onChange([user])
+      console.log("UserPicker: setting single user", user);
+      onChange([user]);
     }
-    if (!multiple) setOpen(false)
-  }
+    if (!multiple) setOpen(false);
+  };
 
   const handleRemove = (userId: string) => {
-    if (!onChange || disabled) return
-    onChange(selected.filter((u) => u.id !== userId))
-  }
+    if (!onChange || disabled) return;
+    
+    console.log("UserPicker: handleRemove", userId);
+    onChange(selected.filter((u) => u.id !== userId));
+  };
 
   if (isEditing) {
     return (
@@ -102,7 +103,7 @@ export function Assignees({
               <CommandEmpty>No users found.</CommandEmpty>
               <CommandGroup>
                 {users.map((user) => {
-                  const isSelected = selected.some((s) => s.id === user.id)
+                  const isSelected = selected.some((s) => s.id === user.id);
                   return (
                     <CommandItem key={user.id} onSelect={() => handleSelect(user)} className="flex items-center gap-2">
                       <Avatar className="h-6 w-6">
@@ -112,17 +113,17 @@ export function Assignees({
                       <span>{user.name}</span>
                       {isSelected && <Check className="ml-auto h-4 w-4" />}
                     </CommandItem>
-                  )
+                  );
                 })}
               </CommandGroup>
             </CommandList>
           </Command>
         </PopoverContent>
       </Popover>
-    )
+    );
   }
 
-  if (!firstUser) return null
+  if (!firstUser) return null;
 
   return (
     <div className="flex items-center gap-2">
@@ -160,6 +161,5 @@ export function Assignees({
         </Popover>
       )}
     </div>
-  )
+  );
 }
-
