@@ -54,7 +54,7 @@ export default function DataGrid({
   disableAddRow = false,
   disableDelete = false,
   hideActionsColumn = false,
-  addRowButtonText = "Add",
+  addRowButtonText,
   onEdit,
   onDelete,
   gridSchema,
