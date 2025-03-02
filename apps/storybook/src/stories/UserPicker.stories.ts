@@ -39,16 +39,9 @@ const meta: Meta<typeof UserPicker> = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Default: Story = {};
-
-export const SingleSelection: Story = {
+export const EditMode: Story = {
   args: {
-    multiple: false,
-  },
-};
-
-export const WithSelectedUsers: Story = {
-  args: {
+    isEditing: true,
     selected: [
       { id: '1', name: 'John Doe', email: 'john@example.com' },
       { id: '3', name: 'Robert Johnson', email: 'robert@example.com' },
@@ -57,15 +50,6 @@ export const WithSelectedUsers: Story = {
 };
 
 export const ViewMode: Story = {
-  args: {
-    isEditing: false,
-    selected: [
-      { id: '1', name: 'John Doe', email: 'john@example.com' },
-    ],
-  },
-};
-
-export const ViewModeWithMultipleUsers: Story = {
   args: {
     isEditing: false,
     selected: [
