@@ -1,6 +1,5 @@
 import React from 'react';
 import { Badge } from "@workspace/ui/components/badge";
-import Link from 'next/link';
 import { UserPicker } from "@workspace/ui/components/UserPicker";
 import { CellComponentProps } from '@workspace/ui/components/DataGrid/types';
 
@@ -23,9 +22,9 @@ export const NumberRenderer: React.FC<CellComponentProps<number>> = ({ value, op
 export const LinkRenderer: React.FC<CellComponentProps<string>> = ({ value, options }) => {
   const baseUrl = options?.baseUrl || '';
   return (
-    <Link href={`${baseUrl}${value}`} className="text-blue-600 hover:underline">
+    <a href={`${baseUrl}${value}`} className="text-blue-600 hover:underline">
       {value}
-    </Link>
+    </a>
   );
 };
 

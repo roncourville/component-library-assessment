@@ -6,11 +6,11 @@ import type { Plasmid } from '../../types/data.types';
 export function useHandlers(setData: React.Dispatch<React.SetStateAction<Plasmid[]>>) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAdd = async (newData: Plasmid) => {
+  const handleAdd = async (newData: any) => {
     setIsLoading(true);
     try {
       const addedPlasmid = await addPlasmid(newData);
-      setData((currentData) => [...currentData, addedPlasmid]);
+      setData((currentData) => [...currentData, addedPlasmid as Plasmid]);
       toast({
         title: "Row added",
       });
@@ -26,7 +26,7 @@ export function useHandlers(setData: React.Dispatch<React.SetStateAction<Plasmid
     }
   };
 
-  const handleUpdate = async (rowId: string, updatedData: Partial<Plasmid>) => {
+  const handleUpdate = async (rowId: string, updatedData: any) => {
     setIsLoading(true);
     try {
       await updatePlasmid(rowId, updatedData);
