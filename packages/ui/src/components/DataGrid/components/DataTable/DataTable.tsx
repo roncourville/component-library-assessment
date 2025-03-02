@@ -5,6 +5,7 @@ import EmptyRow from './EmptyRow';
 import DataRow from '../../DataRow';
 import { ColumnDefinition } from '../../types';
 import { EditingCell } from '../../hooks/useRowActions';
+import LoadingOverlay from './LoadingOverlay';
 
 interface DataTableProps {
   data: Record<string, any>[];
@@ -19,11 +20,16 @@ interface DataTableProps {
   handleCellClick: (rowId: string, key: string) => void;
   handleCellBlur: (rowId: string, key: string) => void;
   isLoading?: boolean;
+  loadingText?: string;
   onEdit: (id: string, action?: string | any, value?: any) => void;
   onDelete?: (id: string) => void;
   handleSort: (key: string) => void;
   getSortConfig: (key: string) => any;
   searchTerm: string;
+  emptyStateMessage?: string;
+  disableDelete?: boolean;
+  hideActionsColumn?: boolean;
+  disableEditMode?: boolean;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -39,14 +45,20 @@ const DataTable: React.FC<DataTableProps> = ({
   handleCellClick,
   handleCellBlur,
   isLoading = false,
+  loadingText,
   onEdit,
   onDelete,
   handleSort,
   getSortConfig,
-  searchTerm
+  searchTerm,
+  emptyStateMessage,
+  disableDelete = false,
+  hideActionsColumn = false,
+  disableEditMode = false
 }) => {
   return (
-    <div className="rounded-lg border border-gray-200 overflow-hidden shadow-sm stripe-card">
+    <div className="rounded-lg border border-gray-200 overflow-hidden shadow-sm stripe-card relative">
+      {isLoading && <LoadingOverlay text={loadingText} />}
       <Table>
         <TableHeader
           columns={columns}
@@ -55,6 +67,7 @@ const DataTable: React.FC<DataTableProps> = ({
           selectedRows={selectedRows}
           totalRowCount={data.length}
           toggleAll={toggleAll}
+          hideActionsColumn={hideActionsColumn}
         />
         <TableBody>
           {data.length > 0 ? (
@@ -72,10 +85,18 @@ const DataTable: React.FC<DataTableProps> = ({
                 editingCell={editingCell}
                 handleCellClick={handleCellClick}
                 handleCellBlur={handleCellBlur}
+                disableDelete={disableDelete}
+                hideActionsColumn={hideActionsColumn}
+                disableEditMode={disableEditMode}
               />
             ))
           ) : (
-            <EmptyRow columnsCount={columns.length} searchTerm={searchTerm} />
+            <EmptyRow 
+              columnsCount={columns.length} 
+              searchTerm={searchTerm} 
+              isLoading={isLoading}
+              emptyStateMessage={emptyStateMessage}
+            />
           )}
         </TableBody>
       </Table>

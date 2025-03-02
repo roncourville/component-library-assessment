@@ -11,17 +11,31 @@ export type SortConfig = {
 interface UseDataFilteringProps {
   data: Record<string, any>[];
   gridSchema: GridSchema;
+  enableSorting?: boolean;
+  enablePagination?: boolean;
+  pageSize?: number;
 }
 
-export function useDataFiltering({ data, gridSchema }: UseDataFilteringProps) {
+export function useDataFiltering({ 
+  data, 
+  gridSchema,
+  enableSorting = true,
+  enablePagination = false,
+  pageSize = 10
+}: UseDataFilteringProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchField, setSearchField] = useState("all");
   const [sortConfigs, setSortConfigs] = useState<SortConfig[]>([
     { key: "id", direction: "asc", priority: 1 }, // Default sort is ASC on ID
   ]);
 
+  // For pagination
+  const [currentPage, setCurrentPage] = useState(1);
+
   // Handle column sort
   const handleSort = useCallback((key: string) => {
+    if (!enableSorting) return;
+    
     setSortConfigs((prevConfigs) => {
       // Find if this column is already being sorted
       const existingConfigIndex = prevConfigs.findIndex((config) => config.key === key);
@@ -50,7 +64,7 @@ export function useDataFiltering({ data, gridSchema }: UseDataFilteringProps) {
         return [...prevConfigs, { key, direction: "asc", priority: prevConfigs.length + 1 }];
       }
     });
-  }, []);
+  }, [enableSorting]);
 
   // Get sort config for a column
   const getSortConfig = useCallback((key: string) => {
@@ -107,7 +121,7 @@ export function useDataFiltering({ data, gridSchema }: UseDataFilteringProps) {
   }, [data, sortConfigs, gridSchema.columns]);
 
   // Add filtered data based on search
-  const filteredData = useMemo(() => {
+  const searchFilteredData = useMemo(() => {
     if (!searchTerm) return sortedData;
 
     return sortedData.filter((row) => {
@@ -139,6 +153,37 @@ export function useDataFiltering({ data, gridSchema }: UseDataFilteringProps) {
       }
     });
   }, [sortedData, searchTerm, searchField]);
+  
+  // Handle pagination
+  const paginatedData = useMemo(() => {
+    if (!enablePagination) return searchFilteredData;
+    
+    const startIndex = (currentPage - 1) * pageSize;
+    return searchFilteredData.slice(startIndex, startIndex + pageSize);
+  }, [searchFilteredData, currentPage, pageSize, enablePagination]);
+  
+  // Calculate total pages
+  const totalPages = useMemo(() => {
+    if (!enablePagination) return 1;
+    return Math.max(1, Math.ceil(searchFilteredData.length / pageSize));
+  }, [searchFilteredData.length, pageSize, enablePagination]);
+  
+  // Handle page changes
+  const goToPage = useCallback((page: number) => {
+    setCurrentPage(Math.min(Math.max(1, page), totalPages));
+  }, [totalPages]);
+  
+  const nextPage = useCallback(() => {
+    if (currentPage < totalPages) {
+      setCurrentPage(prev => prev + 1);
+    }
+  }, [currentPage, totalPages]);
+  
+  const prevPage = useCallback(() => {
+    if (currentPage > 1) {
+      setCurrentPage(prev => prev - 1);
+    }
+  }, [currentPage]);
 
   return {
     searchTerm,
@@ -150,6 +195,13 @@ export function useDataFiltering({ data, gridSchema }: UseDataFilteringProps) {
     handleSort,
     getSortConfig,
     sortedData,
-    filteredData
+    filteredData: paginatedData,
+    // Pagination
+    currentPage,
+    totalPages,
+    goToPage,
+    nextPage,
+    prevPage,
+    totalItems: searchFilteredData.length
   };
 }

@@ -6,6 +6,7 @@ interface UseRowActionsProps {
   data: Record<string, any>[];
   gridSchema: GridSchema;
   onUpdate?: (rowId: string, data: Record<string, any>) => void;
+  disableEditMode?: boolean;
 }
 
 export interface EditingCell {
@@ -13,7 +14,7 @@ export interface EditingCell {
   key: string;
 }
 
-export function useRowActions({ data, gridSchema, onUpdate }: UseRowActionsProps) {
+export function useRowActions({ data, gridSchema, onUpdate, disableEditMode = false }: UseRowActionsProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
   const [editingRows, setEditingRows] = useState<Set<string>>(new Set());
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null);
@@ -73,6 +74,9 @@ export function useRowActions({ data, gridSchema, onUpdate }: UseRowActionsProps
   }, [data]);
 
   const handleCellClick = useCallback((rowId: string, key: string) => {
+    // If edit mode is disabled, don't allow cell editing
+    if (disableEditMode) return;
+    
     // Get the column definition
     const column = gridSchema.columns.find((col) => col.key === key);
     
@@ -98,7 +102,7 @@ export function useRowActions({ data, gridSchema, onUpdate }: UseRowActionsProps
         setEditingCell({ rowId, key });
       }
     }
-  }, [gridSchema.columns, editingCell, saveCurrentEdit]);
+  }, [gridSchema.columns, editingCell, saveCurrentEdit, disableEditMode]);
 
   const handleCellChange = useCallback((rowId: string, key: string, value: any) => {
     console.log(`DataGrid.handleCellChange: rowId=${rowId}, key=${key}, value=`, value);
@@ -199,6 +203,9 @@ export function useRowActions({ data, gridSchema, onUpdate }: UseRowActionsProps
   }, [editingCell, editingRows, gridSchema.columns, saveCurrentEdit]);
 
   const handleEditRow = useCallback((rowId: string) => {
+    // If edit mode is disabled, don't allow row editing
+    if (disableEditMode) return;
+    
     setEditingRows((prev) => new Set(prev).add(rowId));
     // Initialize row edits with current values
     const currentRow = data.find((row) => row.id === rowId);
@@ -208,7 +215,7 @@ export function useRowActions({ data, gridSchema, onUpdate }: UseRowActionsProps
         [rowId]: { ...currentRow },
       }));
     }
-  }, [data]);
+  }, [data, disableEditMode]);
 
   const handleSaveRow = useCallback((rowId: string) => {
     const updatedData = rowEdits[rowId];

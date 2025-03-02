@@ -5,12 +5,16 @@ import { Plus } from "lucide-react";
 interface AddRowButtonProps {
   onAdd?: () => void;
   isLoading?: boolean;
+  buttonText?: string;
 }
 
 const AddRowButton: React.FC<AddRowButtonProps> = ({ 
   onAdd,
-  isLoading = false
+  isLoading = false,
+  buttonText = "Add Row"
 }) => {
+  if (!onAdd) return null;
+  
   return (
     <Button 
       onClick={onAdd} 
@@ -18,7 +22,7 @@ const AddRowButton: React.FC<AddRowButtonProps> = ({
       className="bg-[#635bff] hover:bg-[#4f46e5] text-white"
     >
       <Plus className="mr-2 h-4 w-4" />
-      Add Row
+      {buttonText}
     </Button>
   );
 };

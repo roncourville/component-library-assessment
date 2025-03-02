@@ -3,7 +3,7 @@
 import React from 'react';
 import { GridSchema } from "./types";
 import { useRowActions, useDataFiltering, useOutsideClick } from './hooks';
-import { SearchBar, DataTable, DeleteSelectedButton, AddRowButton } from './components/UIComponents';
+import { SearchBar, DataTable, DeleteSelectedButton, AddRowButton, PaginationControls } from './components/UIComponents';
 
 interface Plasmid {
   id: string;
@@ -17,6 +17,18 @@ interface DataGridProps {
   onUpdate?: (rowId: string, data: Record<string, any>) => void;
   onDelete?: (rowId: string) => void;
   isLoading?: boolean;
+  loadingText?: string;
+  emptyStateMessage?: string;
+  enableSearch?: boolean;
+  enableSorting?: boolean;
+  searchPlaceholder?: string;
+  enablePagination?: boolean;
+  pageSize?: number;
+  disableEditMode?: boolean;
+  disableAddRow?: boolean;
+  disableDelete?: boolean;
+  hideActionsColumn?: boolean;
+  addRowButtonText?: string;
   gridSchema: GridSchema;
   onEdit?: (id: string, data?: Record<string, any>) => void;
 }
@@ -31,6 +43,18 @@ type SortConfig = {
 export default function DataGrid({
   data,
   isLoading,
+  loadingText,
+  emptyStateMessage = "No data available.",
+  enableSearch = true,
+  enableSorting = true,
+  searchPlaceholder = "Search...",
+  enablePagination = false,
+  pageSize = 10,
+  disableEditMode = false,
+  disableAddRow = false,
+  disableDelete = false,
+  hideActionsColumn = false,
+  addRowButtonText = "Add",
   onEdit,
   onDelete,
   gridSchema,
@@ -55,7 +79,8 @@ export default function DataGrid({
   } = useRowActions({
     data,
     gridSchema,
-    onUpdate
+    onUpdate,
+    disableEditMode
   });
   
   const {
@@ -65,10 +90,19 @@ export default function DataGrid({
     setSearchField,
     handleSort,
     getSortConfig,
-    filteredData
+    filteredData,
+    currentPage,
+    totalPages,
+    goToPage,
+    nextPage,
+    prevPage,
+    totalItems
   } = useDataFiltering({
     data,
-    gridSchema
+    gridSchema,
+    enableSorting,
+    enablePagination,
+    pageSize
   });
   
   // Ref for tracking click outside
@@ -108,6 +142,8 @@ export default function DataGrid({
           searchField={searchField}
           setSearchField={setSearchField}
           gridSchema={gridSchema}
+          searchPlaceholder={searchPlaceholder}
+          enableSearch={enableSearch}
         />
 
         <div className="flex gap-2">
@@ -115,11 +151,15 @@ export default function DataGrid({
             selectedRows={selectedRows}
             onDelete={onDelete}
             isLoading={isLoading}
+            disableDelete={disableDelete}
           />
-          <AddRowButton 
-            onAdd={onAdd} 
-            isLoading={isLoading} 
-          />
+          {!disableAddRow && (
+            <AddRowButton 
+              onAdd={onAdd} 
+              isLoading={isLoading}
+              buttonText={addRowButtonText}
+            />
+          )}
         </div>
       </div>
 
@@ -136,12 +176,29 @@ export default function DataGrid({
         handleCellClick={handleCellClick}
         handleCellBlur={handleCellBlur}
         isLoading={isLoading}
+        loadingText={loadingText}
         onEdit={handleRowAction}
         onDelete={onDelete}
         handleSort={handleSort}
         getSortConfig={getSortConfig}
         searchTerm={searchTerm}
+        emptyStateMessage={emptyStateMessage}
+        disableDelete={disableDelete}
+        hideActionsColumn={hideActionsColumn}
+        disableEditMode={disableEditMode}
       />
+      
+      {enablePagination && (
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          goToPage={goToPage}
+          nextPage={nextPage}
+          prevPage={prevPage}
+          pageSize={pageSize}
+        />
+      )}
     </div>
   );
 }

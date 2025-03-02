@@ -194,17 +194,55 @@ const meta: Meta<typeof DataGrid> = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
 export const Default: Story = {};
 
-export const Loading: Story = {
-  args: {
-    isLoading: true,
-  }
+export const WithSearch: Story = { args: { enableSearch: true, searchPlaceholder: 'Search plasmids...' } };
+
+export const WithPagination: Story = { args: { pageSize: 2, enablePagination: true } };
+
+export const WithSorting: Story = { args: { enableSorting: true } };
+
+export const WithAllFeatures: Story = { args: { enableSearch: true, enableSorting: true, enablePagination: true, pageSize: 3, searchPlaceholder: 'Search by any field...' } };
+
+export const Loading: Story = { args: { isLoading: true, loadingText: 'Loading data...' } };
+
+export const EmptyState: Story = { args: { data: [], emptyStateMessage: 'No plasmids found. Click "Add" to create a new entry.' } };
+
+export const ViewOnly: Story = { 
+  args: { 
+    disableEditMode: true, 
+    disableAddRow: true, 
+    disableDelete: true,
+    enableSearch: true,
+    enableSorting: true
+  } 
 };
 
-export const EmptyState: Story = {
-  args: {
-    data: [],
-  }
+export const MinimalFeatures: Story = { 
+  args: { 
+    disableEditMode: true, 
+    disableAddRow: true,
+    disableDelete: true,
+    hideActionsColumn: true,
+    enableSearch: false,
+    enableSorting: false
+  } 
 };
+
+export const ReadOnlyNoActions: Story = { 
+  args: { 
+    disableEditMode: true, 
+    disableAddRow: true,
+    disableDelete: true,
+    hideActionsColumn: true,
+    enableSearch: true,
+    enableSorting: true
+  } 
+};
+
+export const CustomAddButton: Story = { 
+  args: { 
+    addRowButtonText: 'Add New Plasmid'
+  } 
+};
+

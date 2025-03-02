@@ -1,15 +1,17 @@
 # DataGrid Component
 
-A flexible data grid component with support for sorting, filtering, and inline editing. This component is designed to be easily customizable with pluggable components for different column types.
+A flexible data grid component with support for sorting, filtering, pagination, and inline editing. This component is designed to be easily customizable with pluggable components for different column types.
 
 ## Features
 
 - Inline cell editing
 - Row editing
 - Sorting (multi-column)
-- Filtering
+- Filtering and search
+- Pagination
 - Checkbox selection
 - Custom cell renderers and editors
+- Loading animations
 - Responsive layout
 
 ## Pluggable Component System
@@ -81,6 +83,30 @@ return (
 );
 ```
 
+## Component Props
+
+| Prop Name           | Type                                        | Default Value      | Description                                           |
+|---------------------|---------------------------------------------|-------------------|-------------------------------------------------------|
+| data                | Record<string, any>[]                       | -                 | The data to display in the grid                        |
+| gridSchema          | GridSchema                                  | -                 | Schema defining the columns and their configuration    |
+| isLoading           | boolean                                     | false             | Whether the grid is in a loading state                 |
+| loadingText         | string                                      | "Loading data..." | Text to display in the loading overlay                 |
+| emptyStateMessage   | string                                      | "No data available." | Message to display when there is no data             |
+| enableSearch        | boolean                                     | true              | Whether to enable the search functionality             |
+| searchPlaceholder   | string                                      | "Search..."       | Placeholder text for the search input                  |
+| enableSorting       | boolean                                     | true              | Whether to enable column sorting                       |
+| enablePagination    | boolean                                     | false             | Whether to enable pagination                           |
+| pageSize            | number                                      | 10                | Number of items per page when pagination is enabled    |
+| disableEditMode     | boolean                                     | false             | Disable all cell and row editing (view-only mode)      |
+| disableAddRow       | boolean                                     | false             | Hide the "Add Row" button                              |
+| disableDelete       | boolean                                     | false             | Disable row deletion                                   |
+| hideActionsColumn   | boolean                                     | false             | Hide the actions column completely                     |
+| addRowButtonText    | string                                      | "Add"             | Text for the add row button                            |
+| onAdd               | (newData: Plasmid) => Promise<void>         | -                 | Callback when adding a new row                         |
+| onUpdate            | (rowId: string, data: Record<string, any>) => void | -         | Callback when updating a row                           |
+| onDelete            | (rowId: string) => void                     | -                 | Callback when deleting a row                           |
+| onEdit              | (id: string, data?: Record<string, any>) => void | -          | Callback when editing a row                            |
+
 ## Extending with Custom Components
 
 You can create custom cell renderers and editors by implementing the `CellComponentProps` interface:
@@ -126,6 +152,7 @@ Each column in the grid schema can have the following configuration:
     renderer: "text",    // Component name for view mode
     editor: "text",      // Component name for edit mode
     persistCellEditOnBlur?: true, // Whether to keep the cell in edit mode on blur (useful for dropdowns)
+    saveEvent?: "change" | "blur", // When to save cell changes (default is "blur")
     options: {           // Options passed to the components
       // Component-specific options
     }
@@ -133,4 +160,49 @@ Each column in the grid schema can have the following configuration:
   sortable?: true,       // Whether this column can be sorted
   filterable?: true      // Whether this column can be filtered
 }
+```
+
+## Usage Examples
+
+### View-Only Mode
+```tsx
+<DataGrid
+  data={myData}
+  gridSchema={gridSchema}
+  disableEditMode={true}
+  disableAddRow={true}
+  disableDelete={true}
+/>
+```
+
+### Read-Only Mode (No Actions Column)
+```tsx
+<DataGrid
+  data={myData}
+  gridSchema={gridSchema}
+  disableEditMode={true}
+  disableAddRow={true}
+  disableDelete={true}
+  hideActionsColumn={true}
+/>
+```
+
+### With Pagination
+```tsx
+<DataGrid
+  data={myData}
+  gridSchema={gridSchema}
+  enablePagination={true}
+  pageSize={5}
+/>
+```
+
+### With Custom Add Button Text
+```tsx
+<DataGrid
+  data={myData}
+  gridSchema={gridSchema}
+  onAdd={handleAdd}
+  addRowButtonText="Add New Item"
+/>
 ```

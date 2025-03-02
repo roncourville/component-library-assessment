@@ -11,6 +11,7 @@ interface TableHeaderProps {
   selectedRows: Set<string>;
   totalRowCount: number;
   toggleAll: (checked: boolean) => void;
+  hideActionsColumn?: boolean;
 }
 
 const TableHeader: React.FC<TableHeaderProps> = ({
@@ -20,6 +21,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({
   selectedRows,
   totalRowCount,
   toggleAll,
+  hideActionsColumn = false
 }) => {
   return (
     <ShadcnTableHeader className="bg-gray-50">
@@ -39,7 +41,9 @@ const TableHeader: React.FC<TableHeaderProps> = ({
             onSort={handleSort}
           />
         ))}
-        <TableHead className="w-[100px]">Actions</TableHead>
+        {!hideActionsColumn && (
+          <TableHead className="w-[100px]">Actions</TableHead>
+        )}
       </TableRow>
     </ShadcnTableHeader>
   );

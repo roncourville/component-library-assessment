@@ -12,7 +12,7 @@ interface DataRowProps {
     row: any;
     isLoading: boolean;
     onEdit: (id: string, action?: string | any, value?: any) => void;
-    onDelete: (id: string) => void;
+    onDelete?: (id: string) => void;
     columns: ColumnDefinition[];
     toggleRow: (id: string) => void;
     isChecked: boolean;
@@ -20,11 +20,27 @@ interface DataRowProps {
     handleCellBlur?: (rowId: string, key: string) => void;
     isEditing: boolean;
     editingCell?: { rowId: string; key: string } | null;
+    disableDelete?: boolean;
+    hideActionsColumn?: boolean;
+    disableEditMode?: boolean;
 }
 
-const DataRow: React.FC<DataRowProps> = ({ row, isLoading, onEdit, onDelete,
-    columns, handleCellBlur, handleCellClick, isEditing, editingCell,
-    toggleRow, isChecked }) => {
+const DataRow: React.FC<DataRowProps> = ({ 
+    row, 
+    isLoading, 
+    onEdit, 
+    onDelete,
+    columns, 
+    handleCellBlur, 
+    handleCellClick, 
+    isEditing, 
+    editingCell,
+    toggleRow, 
+    isChecked,
+    disableDelete = false,
+    hideActionsColumn = false,
+    disableEditMode = false
+}) => {
     
     // Check if a specific cell is being edited, taking editDisabled into account
     const isCellEditing = (columnKey: string) => {
@@ -119,7 +135,8 @@ const DataRow: React.FC<DataRowProps> = ({ row, isLoading, onEdit, onDelete,
                     </div>
                 </TableCell>
             ))}
-            <TableCell>
+            {!hideActionsColumn && (
+              <TableCell>
                 <div className="flex items-center gap-2">
                     {isEditing ? (
                         <>
@@ -128,12 +145,13 @@ const DataRow: React.FC<DataRowProps> = ({ row, isLoading, onEdit, onDelete,
                         </>
                     ) : (
                         <>
-                            <EditButton onClick={() => onEdit(row.id, 'edit')} disabled={isLoading} />
-                            <DeleteButton onClick={() => onDelete(row.id)} disabled={isLoading} />
+                            {!disableEditMode && <EditButton onClick={() => onEdit(row.id, 'edit')} disabled={isLoading} />}
+                            {!disableDelete && onDelete && <DeleteButton onClick={() => onDelete(row.id)} disabled={isLoading} />}
                         </>
                     )}
                 </div>
-            </TableCell>
+              </TableCell>
+            )}
         </TableRow>
     )
 };

@@ -7,12 +7,14 @@ interface DeleteSelectedButtonProps {
   selectedRows: Set<string>;
   onDelete?: (id: string) => void;
   isLoading?: boolean;
+  disableDelete?: boolean;
 }
 
 const DeleteSelectedButton: React.FC<DeleteSelectedButtonProps> = ({ 
   selectedRows, 
   onDelete,
-  isLoading = false
+  isLoading = false,
+  disableDelete = false
 }) => {
   const handleDeleteSelected = () => {
     // Delete all selected rows
@@ -26,7 +28,7 @@ const DeleteSelectedButton: React.FC<DeleteSelectedButtonProps> = ({
     });
   };
 
-  if (selectedRows.size === 0) {
+  if (selectedRows.size === 0 || disableDelete || !onDelete) {
     return null;
   }
 

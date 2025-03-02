@@ -17,6 +17,16 @@ const config = {
         sans: ["var(--font-sans)", ...fontFamily.sans],
         mono: ["var(--font-mono)", ...fontFamily.mono],
       },
+      keyframes: {
+        "progress-indeterminate": {
+          "0%": { width: "0%", transform: "translateX(-100%)" },
+          "50%": { width: "70%" },
+          "100%": { width: "0%", transform: "translateX(200%)" }
+        },
+      },
+      animation: {
+        "progress-indeterminate": "progress-indeterminate 2s ease-in-out infinite",
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

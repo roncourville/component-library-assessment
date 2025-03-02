@@ -9,6 +9,8 @@ interface SearchBarProps {
   searchField: string;
   setSearchField: (field: string) => void;
   gridSchema: GridSchema;
+  searchPlaceholder?: string;
+  enableSearch?: boolean;
 }
 
 const SearchBar: React.FC<SearchBarProps> = ({
@@ -17,7 +19,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   searchField,
   setSearchField,
   gridSchema,
+  searchPlaceholder = "Search...",
+  enableSearch = true,
 }) => {
+  if (!enableSearch) return null;
   return (
     <div className="w-full max-w-[600px]">
       <div className="flex">
@@ -37,7 +42,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
         <Input
           placeholder={
             searchField === "all"
-              ? "Search..."
+              ? searchPlaceholder
               : `Search ${gridSchema.columns.find((col) => col.key === searchField)?.header.toLowerCase() || ""}...`
           }
           value={searchTerm}

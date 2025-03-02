@@ -9,12 +9,14 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "chromatic": "npx chromatic --project-token=chpt_697927d0c2081de"
   },
   "dependencies": {
     "@storybook/experimental-addon-test": "8.6.2",
     "@tailwindcss/vite": "^4.0.9",
     "@workspace/ui": "workspace:*",
+    "chromatic": "^11.26.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
   },
