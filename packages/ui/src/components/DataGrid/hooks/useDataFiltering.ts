@@ -78,15 +78,19 @@ export function useDataFiltering({ data, gridSchema }: UseDataFilteringProps) {
         const column = gridSchema.columns.find((col) => col.key === key);
 
         // Check if this is a user renderer
-        const renderer = column?.config.renderer;
-        const isUserRenderer = 
-          (typeof renderer === 'string' && renderer === 'user') ||
-          (typeof renderer !== 'string' && renderer.name === 'UserRenderer');
+        const renderer = column?.config?.renderer;
         
-        if (isUserRenderer && Array.isArray(valueA) && Array.isArray(valueB)) {
-          // Sort by first user's name
-          valueA = valueA.length > 0 ? valueA[0].name : "";
-          valueB = valueB.length > 0 ? valueB[0].name : "";
+        // Only proceed if column and renderer are defined
+        if (column && renderer) {
+          const isUserRenderer = 
+            (typeof renderer === 'string' && renderer === 'user') ||
+            (typeof renderer !== 'string' && renderer.name === 'UserRenderer');
+          
+          if (isUserRenderer && Array.isArray(valueA) && Array.isArray(valueB)) {
+            // Sort by first user's name, with null checks
+            valueA = (valueA.length > 0 && valueA[0]?.name) ? valueA[0].name : "";
+            valueB = (valueB.length > 0 && valueB[0]?.name) ? valueB[0].name : "";
+          }
         }
 
         // Compare values

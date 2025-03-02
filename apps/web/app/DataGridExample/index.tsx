@@ -9,12 +9,6 @@ import { gridSchema } from "./schema"
 export default function Page() {
   const { data, setData, isLoading } = usePlasmids();
   const { handleAdd, handleUpdate, handleDelete } = useHandlers(setData);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.theme = "light";
-    }
-  }, []);
   
   return (
     <div className="p-4">

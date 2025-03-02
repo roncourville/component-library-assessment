@@ -1,0 +1,144 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 240 10% 3.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 240 10% 3.9%;
+  --primary: 255 92% 76%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 240 4.8% 95.9%;
+  --secondary-foreground: 240 5.9% 10%;
+  --muted: 240 4.8% 95.9%;
+  --muted-foreground: 240 3.8% 46.1%;
+  --accent: 240 4.8% 95.9%;
+  --accent-foreground: 240 5.9% 10%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 5.9% 90%;
+  --input: 240 5.9% 90%;
+  --ring: 255 92% 76%;
+  --radius: 0.75rem;
+}
+
+
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --primary: 255 92% 76%;
+  --primary-foreground: 240 5.9% 10%;
+  --secondary: 240 3.7% 15.9%;
+  --secondary-foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --ring: 255 92% 76%;
+}
+
+* {
+  @apply border-border;
+}
+
+body {
+  @apply bg-background text-foreground;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+    "Helvetica Neue", sans-serif;
+}
+
+/* Stripe-like focus styles */
+*:focus {
+  outline: none;
+}
+
+/* Stripe-like button styles */
+.btn-stripe {
+  @apply bg-[#635bff] text-white hover:bg-[#4f46e5] shadow-sm;
+  transition: all 0.15s ease;
+}
+
+/* Stripe-like table styles */
+table {
+  @apply w-full border-collapse;
+}
+
+thead {
+  @apply bg-gray-50;
+}
+
+th {
+  @apply text-sm font-medium text-gray-600 px-4 py-3 text-left;
+}
+
+td {
+  @apply px-4 py-3 border-t border-gray-200;
+}
+
+tr:hover {
+  @apply bg-gray-50;
+}
+
+/* Stripe-like input styles */
+input,
+select {
+  @apply rounded-md border border-gray-300 focus:border-[#635bff] focus:ring-0;
+  transition: border-color 0.15s ease;
+}
+
+/* Stripe-like toast styles */
+.toast {
+  @apply bg-gray-800 text-white py-2 px-4 rounded-lg shadow-lg text-sm;
+  max-width: 80vw;
+  animation: toast-in 0.2s ease-out, toast-out 0.2s ease-in 2.8s forwards;
+}
+
+@keyframes toast-in {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toast-out {
+  from {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateY(-8px);
+    opacity: 0;
+  }
+}
+
+/* Stripe-like card styles */
+.stripe-card {
+  @apply bg-white rounded-lg border border-gray-200 shadow-sm;
+  transition: box-shadow 0.15s ease;
+}
+
+.stripe-card:hover {
+  @apply shadow-md;
+}
+
+/* Stripe-like checkbox styles */
+.checkbox-stripe {
+  @apply rounded-sm border-2 border-gray-300 text-[#635bff];
+}
+
