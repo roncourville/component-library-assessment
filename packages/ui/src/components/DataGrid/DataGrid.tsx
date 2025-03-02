@@ -48,7 +48,7 @@ export default function DataGrid({
   enableSearch = true,
   enableSorting = true,
   searchPlaceholder = "Search...",
-  enablePagination = false,
+  enablePagination = true,
   pageSize = 10,
   disableEditMode = false,
   disableAddRow = false,
