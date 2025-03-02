@@ -1,13 +1,13 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-import DataGrid from '@workspace/ui/components/DataGrid';
-import type { User } from '@workspace/ui/components/UserPicker';
+import { DataGrid } from './index';
+import { User } from '../UserPicker/types';
 
 const users: User[] = [
-  { id: '1', name: 'John Doe', email: 'john@example.com', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
-  { id: '2', name: 'Jane Smith', email: 'jane@example.com', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
-  { id: '3', name: 'Robert Johnson', email: 'robert@example.com', image: 'https://randomuser.me/api/portraits/men/2.jpgpng' },
-  { id: '4', name: 'Emily Davis', email: 'emily@example.com', image: 'https://randomuser.me/api/portraits/women/1.jpg' },
+  { id: '1', name: 'John Doe', email: 'john@example.com', image: 'https://github.com/shadcn.png' },
+  { id: '2', name: 'Jane Smith', email: 'jane@example.com', image: 'https://github.com/shadcn.png' },
+  { id: '3', name: 'Robert Johnson', email: 'robert@example.com', image: 'https://github.com/shadcn.png' },
+  { id: '4', name: 'Emily Davis', email: 'emily@example.com', image: 'https://github.com/shadcn.png' },
 ];
 
 const sampleData = [

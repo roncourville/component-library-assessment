@@ -2,8 +2,7 @@ import React from 'react';
 import { Badge } from "@workspace/ui/components/badge";
 import { Input } from "@workspace/ui/components/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import Link from 'next/link';
-import { UserPicker } from "@workspace/ui/components/UserPicker";
+import { UserPicker } from "@workspace/ui/components/UserPicker/UserPicker";
 import { CellComponentProps } from '../types';
 import PluginRegistry from '../PluginRegistry';
 
@@ -49,9 +48,9 @@ const NumberEditor = ({ value, onChange, options }: CellComponentProps<number>) 
 const LinkRenderer = ({ value, options }: CellComponentProps<string>) => {
   const baseUrl = options?.baseUrl || '';
   return (
-    <Link href={`${baseUrl}${value}`} className="text-blue-600 hover:underline">
+    <a href={`${baseUrl}${value}`} className="text-blue-600 hover:underline">
       {value}
-    </Link>
+    </a>
   );
 };
 

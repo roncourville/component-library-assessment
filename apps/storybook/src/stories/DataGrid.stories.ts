@@ -1,8 +1,54 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from '@storybook/test';
-import DataGrid from '@workspace/ui/components/DataGrid';
-import type { User } from '@workspace/ui/components/UserPicker';
+import DataGrid from '@workspace/ui/components/DataGrid/DataGrid';
 
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  image?: string;
+}
+
+export interface UserPickerState {
+  open: boolean;
+}
+
+export interface CellComponentProps<T = any> {
+  value: T;
+  row?: Record<string, any>;
+  isEditing: boolean;
+  onChange?: (newValue: T) => void;
+  options?: Record<string, any>;
+}
+
+export type ComponentType = React.ComponentType<CellComponentProps<any>>;
+
+export type ColumnType = {
+  renderer: string | ComponentType; // Name of registered component or direct React component
+  editor?: string | ComponentType; // Name of registered component or direct React component
+  options?: Record<string, any>; // Configuration options for components
+  saveEvent?: 'blur' | 'change'; // When to save the cell value and exit edit mode - 'blur' (default) or 'change'
+};
+
+export interface ColumnDefinition {
+  key: string; // Unique identifier
+  header: string; // Column header for UI
+  width?: string;
+  fixedWidth?: string;
+  dbField?: string; // Maps to Supabase column name
+  config: ColumnType; // Defines the renderer & editor
+  sortable?: boolean;
+  filterable?: boolean;
+  editDisabled?: boolean;
+}
+
+export interface GridSchema {
+  columns: ColumnDefinition[];
+  uniqueKey: string; // Unique identifier for rows
+  defaultEditorMode?: "inline" | "modal"; // Defines how editing is handled
+  customRenderers?: Record<string, (props: any) => JSX.Element>; // For dynamically registered renderers
+  customEditors?: Record<string, (props: any) => JSX.Element>; // For dynamically registered editors
+}
 const users: User[] = [
   { id: '1', name: 'John Doe', email: 'john@example.com', image: 'https://randomuser.me/api/portraits/men/1.jpg' },
   { id: '2', name: 'Jane Smith', email: 'jane@example.com', image: 'https://randomuser.me/api/portraits/women/2.jpg' },
@@ -62,55 +108,67 @@ const plasmidOptions = [
   'GT-plasmids-10: pAAV-CRISPR',
 ];
 
-const columns = [
+const columns: ColumnDefinition[] = [
   {
-    id: 'plasmid',
+    key: 'plasmid',
     header: 'Plasmid',
-    accessorKey: 'plasmid',
-    cellType: 'tag',
-    meta: {
-      plasmidOptions,
+    config: {
+      renderer: 'tag',
+      editor: 'tag',
+      options: {
+        plasmidOptions,
+      },
     },
   },
   {
-    id: 'volume',
+    key: 'volume',
     header: 'Volume (µL)',
-    accessorKey: 'volume',
-    cellType: 'number',
-    meta: {
-      unit: 'µL',
+    config: {
+      renderer: 'number',
+      editor: 'number',
+      options: {
+        unit: 'µL',
+      },
     },
   },
   {
-    id: 'length',
+    key: 'length',
     header: 'Length (bp)',
-    accessorKey: 'length',
-    cellType: 'number',
-    meta: {
-      unit: 'bp',
+    config: {
+      renderer: 'number',
+      editor: 'number',
+      options: {
+        unit: 'bp',
+      },
     },
   },
   {
-    id: 'storageLocation',
+    key: 'storageLocation',
     header: 'Storage',
-    accessorKey: 'storageLocation',
-    cellType: 'text',
-  },
-  {
-    id: 'assignees',
-    header: 'Assignees',
-    accessorKey: 'assignees',
-    cellType: 'user',
-    meta: {
-      allUsers: users,
-      multiple: true,
+    config: {
+      renderer: 'text',
+      editor: 'text',
     },
   },
   {
-    id: 'notes',
+    key: 'assignees',
+    header: 'Assignees',
+    config: {
+      renderer: 'user',
+      editor: 'user',
+      options: {
+        allUsers: users,
+        multiple: true,
+      },
+    },
+  },
+  {
+    key: 'notes',
     header: 'Notes',
-    accessorKey: 'notes',
-    cellType: 'text',
+    config: {
+      renderer: 'text',
+      editor: 'text',
+    },
   },
 ];
 
@@ -122,7 +180,11 @@ const meta: Meta<typeof DataGrid> = {
   },
   args: {
     data: sampleData,
-    columns: columns,
+    gridSchema: {
+      columns: columns,
+      uniqueKey: 'id',
+      defaultEditorMode: 'inline'
+    },
     onAdd: fn(),
     onUpdate: fn(),
     onDelete: fn(),
@@ -135,46 +197,14 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
 
-export const WithSearch: Story = {
-  args: {
-    enableSearch: true,
-    searchPlaceholder: 'Search plasmids...'
-  }
-};
-
-export const WithPagination: Story = {
-  args: {
-    pageSize: 2,
-    enablePagination: true
-  }
-};
-
-export const WithSorting: Story = {
-  args: {
-    enableSorting: true
-  }
-};
-
-export const WithAllFeatures: Story = {
-  args: {
-    enableSearch: true,
-    enableSorting: true,
-    enablePagination: true,
-    pageSize: 3,
-    searchPlaceholder: 'Search by any field...'
-  }
-};
-
 export const Loading: Story = {
   args: {
     isLoading: true,
-    loadingText: 'Loading plasmids...'
   }
 };
 
 export const EmptyState: Story = {
   args: {
     data: [],
-    emptyStateMessage: 'No plasmids found. Click "Add" to create a new entry.'
   }
 };
