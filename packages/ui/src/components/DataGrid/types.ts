@@ -24,8 +24,6 @@ export interface ColumnDefinition {
   fixedWidth?: string;
   dbField?: string; // Maps to Supabase column name
   config: ColumnType; // Defines the renderer & editor
-  sortable?: boolean;
-  filterable?: boolean;
   editDisabled?: boolean;
 }
 
@@ -47,9 +45,8 @@ export interface PaginationOptions {
 export interface DataFetchOptions {
   page: number;
   pageSize: number;
-  searchTerm?: string;
-  sortColumn?: string;
-  sortDirection?: 'asc' | 'desc';
+  prefetchAdjacentPages?: boolean;
+  forceRefresh?: boolean; // Flag to force data refresh even if the page is cached
 }
 
 export interface DataFetchResult {

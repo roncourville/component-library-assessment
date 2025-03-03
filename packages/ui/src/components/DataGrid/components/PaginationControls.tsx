@@ -136,7 +136,7 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   return (
     <div className="flex items-center justify-between py-2">
       <div className="text-sm text-gray-500">
-        Showing {startItem} to {endItem} of {totalItems} items
+        Showing {startItem.toLocaleString()} to {endItem.toLocaleString()} of {totalItems.toLocaleString()} items
       </div>
       
       <div className="flex items-center space-x-1">

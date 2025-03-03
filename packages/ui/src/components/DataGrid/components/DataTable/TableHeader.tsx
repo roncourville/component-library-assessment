@@ -6,8 +6,6 @@ import { ColumnDefinition } from '../../types';
 
 interface TableHeaderProps {
   columns: ColumnDefinition[];
-  handleSort: (key: string) => void;
-  getSortConfig: (key: string) => any;
   selectedRows: Set<string>;
   totalRowCount: number;
   toggleAll: (checked: boolean) => void;
@@ -16,8 +14,6 @@ interface TableHeaderProps {
 
 const TableHeader: React.FC<TableHeaderProps> = ({
   columns,
-  handleSort,
-  getSortConfig,
   selectedRows,
   totalRowCount,
   toggleAll,
@@ -37,8 +33,6 @@ const TableHeader: React.FC<TableHeaderProps> = ({
           <HeaderCell
             key={column.key}
             column={column}
-            sortConfig={getSortConfig(column.key)}
-            onSort={handleSort}
           />
         ))}
         {!hideActionsColumn && (

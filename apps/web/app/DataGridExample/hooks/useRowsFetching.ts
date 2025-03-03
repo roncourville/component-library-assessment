@@ -55,7 +55,8 @@ export function useRowsFetching() {
       await loadData({ 
         page: 1, 
         pageSize: 10,
-        prefetchAdjacentPages: false // Force a complete refresh after adding
+        prefetchAdjacentPages: false, // Force a complete refresh after adding
+        forceRefresh: true  // Force a refresh of all cached data
       });
       toast({
         title: "Success",
@@ -82,7 +83,8 @@ export function useRowsFetching() {
       await loadData({ 
         page: 1, 
         pageSize: 10,
-        prefetchAdjacentPages: false 
+        prefetchAdjacentPages: false,
+        forceRefresh: true  // Force a refresh of all cached data
       });
       toast({
         title: "Success",
@@ -109,7 +111,8 @@ export function useRowsFetching() {
       await loadData({ 
         page: 1, 
         pageSize: 10,
-        prefetchAdjacentPages: false
+        prefetchAdjacentPages: false,
+        forceRefresh: true  // Force a refresh of all cached data
       });
       toast({
         title: "Success",

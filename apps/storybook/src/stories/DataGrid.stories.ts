@@ -37,8 +37,6 @@ export interface ColumnDefinition {
   fixedWidth?: string;
   dbField?: string; // Maps to Supabase column name
   config: ColumnType; // Defines the renderer & editor
-  sortable?: boolean;
-  filterable?: boolean;
   editDisabled?: boolean;
 }
 
@@ -199,11 +197,8 @@ export const Default: Story = {};
 export const MinimalFeatures: Story = { 
   args: { 
     disableEditMode: true, 
-    disableAddRow: true,
     disableDelete: true,
     hideActionsColumn: true,
-    enableSearch: false,
-    enableSorting: false,
     enablePagination: false
   } 
 };
@@ -211,18 +206,15 @@ export const MinimalFeatures: Story = {
 export const ViewOnly: Story = { 
   args: { 
     disableEditMode: true, 
-    disableAddRow: true, 
     disableDelete: true,
-    enableSearch: true,
-    enableSorting: true,
     hideActionsColumn: true
   } 
 };
 
 export const Loading: Story = { args: { isLoading: true, loadingText: 'Loading data...' } };
 
-export const EmptyState: Story = { args: { data: [], emptyStateMessage: 'No plasmids found. Click "Add" to create a new entry.' } };
+export const EmptyState: Story = { args: { data: [], emptyStateMessage: 'No plasmids found.' } };
 
 export const WithPagination: Story = { args: { pageSize: 2, enablePagination: true } };
 
-export const WithAllFeatures: Story = { args: { enableSearch: true, enableSorting: true, enablePagination: true, pageSize: 3, searchPlaceholder: 'Search by any field...' } };
+export const WithAllFeatures: Story = { args: { enablePagination: true, pageSize: 3 } };

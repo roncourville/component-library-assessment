@@ -3,7 +3,7 @@
 import React, { useEffect } from 'react';
 import { DataFetchOptions, DataFetchResult, GridSchema } from "./types";
 import { useRowActions, useDataFiltering, useOutsideClick } from './hooks';
-import { SearchBar, DataTable, DeleteSelectedButton, AddRowButton, PaginationControls } from './components/UIComponents';
+import { DataTable, DeleteSelectedButton, PaginationControls } from './components/UIComponents';
 
 interface Plasmid {
   id: string;
@@ -13,22 +13,16 @@ interface Plasmid {
 
 interface DataGridProps {
   data?: Record<string, any>[];
-  onAdd?: (newData: Plasmid) => Promise<void>;
   onUpdate?: (rowId: string, data: Record<string, any>) => void;
   onDelete?: (rowId: string) => void;
   isLoading?: boolean;
   loadingText?: string;
   emptyStateMessage?: string;
-  enableSearch?: boolean;
-  enableSorting?: boolean;
-  searchPlaceholder?: string;
   enablePagination?: boolean;
   pageSize?: number;
   disableEditMode?: boolean;
-  disableAddRow?: boolean;
   disableDelete?: boolean;
   hideActionsColumn?: boolean;
-  addRowButtonText?: string;
   gridSchema: GridSchema;
   onEdit?: (id: string, data?: Record<string, any>) => void;
   
@@ -51,24 +45,18 @@ export default function DataGrid({
   isLoading: externalIsLoading,
   loadingText,
   emptyStateMessage = "No data available.",
-  enableSearch = true,
-  enableSorting = true,
-  searchPlaceholder = "Search...",
   enablePagination = true,
   pageSize = 10,
   disableEditMode = false,
-  disableAddRow = false,
   disableDelete = false,
   hideActionsColumn = false,
-  addRowButtonText,
   onEdit,
   onDelete,
   gridSchema,
-  onAdd,
   onUpdate,
   // Server-side pagination props
   loadData,
-  serverSidePagination = false,
+  serverSidePagination = true,
   totalCount: externalTotalCount,
   totalPages: externalTotalPages,
 }: DataGridProps) {
@@ -112,25 +100,16 @@ export default function DataGrid({
   });
   
   const {
-    searchTerm,
-    setSearchTerm,
-    searchField,
-    setSearchField,
-    handleSort,
-    getSortConfig,
     filteredData,
     currentPage,
     totalPages: clientTotalPages,
     goToPage: clientGoToPage,
     nextPage: clientNextPage,
     prevPage: clientPrevPage,
-    totalItems: clientTotalItems,
-    sortConfigs,
-    setSortConfigs
+    totalItems: clientTotalItems
   } = useDataFiltering({
     data: serverSidePagination ? internalData : data,
     gridSchema,
-    enableSorting,
     enablePagination: serverSidePagination ? false : enablePagination, // Disable client pagination if server pagination is enabled
     pageSize
   });
@@ -164,18 +143,19 @@ export default function DataGrid({
       // Check if the requested page is already in the cache
       const requestedPage = options.page;
       const isCached = cachedPages[requestedPage] && cachedPages[requestedPage].length > 0;
+      const forceRefresh = options.forceRefresh || false;
       
       logCacheState();
-      console.log(`Page ${requestedPage} cached:`, isCached);
+      console.log(`Page ${requestedPage} cached:`, isCached, `forceRefresh:`, forceRefresh);
       
-      if (isCached) {
+      if (isCached && !forceRefresh) {
         console.log(`Using cached data for page ${requestedPage}`);
         // Use the cached data without showing loading state
         setInternalData(cachedPages[requestedPage]);
         setInternalCurrentPage(requestedPage);
         return;
       }
-      
+
       // If not cached, show loading and fetch from server
       setInternalIsLoading(true);
       console.log('Fetching data with options:', options);
@@ -281,10 +261,7 @@ export default function DataGrid({
   const serverGoToPage = React.useCallback((page: number) => {
     if (!serverSidePagination || !loadData) return;
     
-    // Get primary sort column and direction
-    const primarySort = sortConfigs[0] || { key: gridSchema.uniqueKey, direction: 'asc' as const };
-    
-    console.log(`Changing to page ${page} with sort:`, primarySort);
+    console.log(`Changing to page ${page}`);
     
     // Check if the requested page is already in the cache
     const isCached = cachedPages[page] && cachedPages[page].length > 0;
@@ -310,10 +287,7 @@ export default function DataGrid({
         // Fetch surrounding pages in the background without loading state
         loadData({
           page, // Use current page as center for prefetching window
-          pageSize,
-          searchTerm: searchTerm || undefined,
-          sortColumn: primarySort.key,
-          sortDirection: primarySort.direction as 'asc' | 'desc' || 'asc'
+          pageSize
         }).then(result => {
           if (result.allPrefetchedData) {
             console.log('Background prefetch successful, updating cache');
@@ -384,13 +358,10 @@ export default function DataGrid({
       // Fetch the requested page and prefetch next pages
       fetchData({
         page,
-        pageSize,
-        searchTerm: searchTerm || undefined,
-        sortColumn: primarySort.key,
-        sortDirection: primarySort.direction as 'asc' | 'desc' || 'asc'
+        pageSize
       });
     }
-  }, [fetchData, pageSize, searchTerm, gridSchema.uniqueKey, sortConfigs, loadData,
+  }, [fetchData, pageSize, loadData, 
       serverSidePagination, internalTotalPages, cachedPages, logCacheState]);
   
   // Handle next page for server pagination
@@ -435,28 +406,29 @@ export default function DataGrid({
   // Initialize data fetching on mount
   useEffect(() => {
     if (serverSidePagination && loadData) {
-      // Get primary sort column and direction
-      const primarySort = sortConfigs[0] || { key: gridSchema.uniqueKey, direction: 'asc' as const };
+      // Default sort by ID
+      const primarySort = { key: gridSchema.uniqueKey, direction: 'asc' as const };
       
       console.log('Initial data fetch with currentPage:', currentPage);
       fetchData({
         page: currentPage,
-        pageSize,
-        searchTerm: searchTerm || undefined,
-        sortColumn: primarySort.key,
-        sortDirection: primarySort.direction as 'asc' | 'desc' || 'asc'
+        pageSize
       });
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // Only run on mount, all other updates will be handled explicitly
   
-  // Clear cache when search or sort changes
+  // Initialize data loading
   useEffect(() => {
-    if (serverSidePagination) {
-      console.log('Search or sort criteria changed, clearing page cache');
-      setCachedPages({});
+    if (serverSidePagination && loadData) {
+      // Initial data fetch
+      fetchData({
+        page: 1,
+        pageSize
+      });
     }
-  }, [searchTerm, sortConfigs, serverSidePagination]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverSidePagination]);
 
 
   // Handle row edit or save action from DataRow
@@ -477,6 +449,25 @@ export default function DataGrid({
       handleCellChange(rowId, action, value);
     }
   };
+  
+  // Handle row deletion with data refresh
+  const handleRowDelete = React.useCallback((rowId: string) => {
+    if (onDelete) {
+      onDelete(rowId);
+      
+      // After deleting a row, refresh data if using server-side pagination
+      if (serverSidePagination && loadData) {
+        // Small timeout to allow the delete operation to complete
+        setTimeout(() => {
+          fetchData({
+            page: internalCurrentPage,
+            pageSize,
+            forceRefresh: true // Force refresh to bypass cache after deletion
+          });
+        }, 100);
+      }
+    }
+  }, [onDelete, serverSidePagination, loadData, fetchData, internalCurrentPage, pageSize]);
 
   // Log cache state whenever the component renders (helpful for debugging)
   React.useEffect(() => {
@@ -513,15 +504,6 @@ export default function DataGrid({
     <div className="space-y-4" ref={cellRef}>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <SearchBar
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            searchField={searchField}
-            setSearchField={setSearchField}
-            gridSchema={gridSchema}
-            searchPlaceholder={searchPlaceholder}
-            enableSearch={enableSearch}
-          />
           {serverSidePagination && <CacheStatus />}
         </div>
 
@@ -532,13 +514,6 @@ export default function DataGrid({
             isLoading={isLoading}
             disableDelete={disableDelete}
           />
-          {!disableAddRow && (
-            <AddRowButton 
-              onAdd={onAdd} 
-              isLoading={isLoading}
-              buttonText={addRowButtonText}
-            />
-          )}
         </div>
       </div>
 
@@ -557,55 +532,7 @@ export default function DataGrid({
         isLoading={isLoading}
         loadingText={loadingText}
         onEdit={handleRowAction}
-        onDelete={onDelete}
-        handleSort={serverSidePagination 
-          ? (column: string) => {
-              console.log('Server-side sorting for column:', column);
-              
-              // First, check if the column is sortable
-              const columnDef = gridSchema.columns.find(col => col.key === column);
-              if (columnDef && columnDef.sortable === false) {
-                console.log('Column is not sortable:', column);
-                return;
-              }
-              
-              // Get the current direction for this column
-              const currentConfig = getSortConfig(column);
-              // Toggle direction or default to asc
-              const newDirection = !currentConfig 
-                ? 'asc' 
-                : currentConfig.direction === 'asc' 
-                  ? 'desc' 
-                  : 'asc';
-                  
-              console.log(`Sorting by ${column} ${newDirection}`);
-              
-              // Update the sort configuration in the UI
-              const newSortConfig: SortConfig[] = [{
-                key: column,
-                direction: newDirection,
-                priority: 1
-              }];
-              
-              // Update UI sort state first
-              setSortConfigs(newSortConfig);
-              
-              try {
-                // Call fetchData with the sorting parameters
-                fetchData({
-                  page: currentPage,
-                  pageSize,
-                  searchTerm: searchTerm || undefined,
-                  sortColumn: column,
-                  sortDirection: newDirection as 'asc' | 'desc'
-                });
-              } catch (error) {
-                console.error('Error during sorting:', error);
-              }
-            }
-          : handleSort}
-        getSortConfig={getSortConfig}
-        searchTerm={searchTerm}
+        onDelete={handleRowDelete}
         emptyStateMessage={emptyStateMessage}
         disableDelete={disableDelete}
         hideActionsColumn={hideActionsColumn}

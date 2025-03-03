@@ -42,17 +42,11 @@ export function mapFromSupabaseFormat(data: Record<string, any>): Record<string,
 export async function fetchRows(options?: { 
   page?: number; 
   pageSize?: number; 
-  searchTerm?: string;
-  sortColumn?: string;
-  sortDirection?: 'asc' | 'desc';
   prefetchAdjacentPages?: boolean;
 }) {
   const { 
     page = 1, 
     pageSize = 10,
-    searchTerm = '',
-    sortColumn = 'id',
-    sortDirection = 'asc',
     prefetchAdjacentPages = true
   } = options || {};
 
@@ -88,29 +82,6 @@ export async function fetchRows(options?: {
   
   // Build the data query with pagination
   let query = supabase.from("plasmids").select("*");
-  
-  // Add search if provided
-  if (searchTerm) {
-    // Use the search function if available, otherwise do basic filtering
-    try {
-      return searchPlasmids(searchTerm);
-    } catch (e) {
-      // If search RPC fails, fallback to basic filtering
-      query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
-    }
-  }
-  
-  // Add sorting
-  if (sortColumn && sortDirection) {
-    console.log('Sorting by column:', sortColumn, 'direction:', sortDirection);
-    
-    // Find the corresponding db field for the column
-    const column = gridSchema.columns.find(col => col.key === sortColumn);
-    const dbFieldName = column?.dbField || sortColumn;
-    
-    console.log('Using DB field for sorting:', dbFieldName);
-    query = query.order(dbFieldName, { ascending: sortDirection === 'asc' });
-  }
   
   // Add pagination with the adjusted range if prefetching
   query = query.range(offset, offset + fetchPageSize - 1);
@@ -257,13 +228,5 @@ export async function fetchUsers() {
   if (error) throw error
 
   return data
-}
-
-export async function searchPlasmids(searchTerm: string) {
-  const { data, error } = await supabase.rpc("search_plasmids", { search_term: searchTerm })
-
-  if (error) throw error
-
-  return data.map(mapFromSupabaseFormat)
 }
 

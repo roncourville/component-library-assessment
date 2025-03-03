@@ -30,9 +30,7 @@ export const gridSchema: GridSchema = {
         options: {
           baseUrl: "/plasmids/",
         },
-      },
-      sortable: true,
-      filterable: true,
+      }
     },
     {
       key: "plasmid",
@@ -46,9 +44,7 @@ export const gridSchema: GridSchema = {
         options: {
           placeholder: "Select plasmid"
         },
-      },
-      sortable: true,
-      filterable: true,
+      }
     },
     {
       key: "volume",
@@ -62,9 +58,7 @@ export const gridSchema: GridSchema = {
         options: {
           unit: "μl",
         },
-      },
-      sortable: true,
-      filterable: true,
+      }
     },
     {
       key: "length",
@@ -78,9 +72,7 @@ export const gridSchema: GridSchema = {
         options: {
           unit: "bp",
         },
-      },
-      sortable: true,
-      filterable: true,
+      }
     },
     {
       key: "storageLocation",
@@ -90,9 +82,7 @@ export const gridSchema: GridSchema = {
       config: {
         renderer: TextRenderer,
         editor: TextEditor,
-      },
-      sortable: true,
-      filterable: true,
+      }
     },
     {
       key: "assignees",
@@ -106,9 +96,7 @@ export const gridSchema: GridSchema = {
         options: {
           multiple: true,
         },
-      },
-      sortable: false,
-      filterable: true,
+      }
     },
   ],
 };

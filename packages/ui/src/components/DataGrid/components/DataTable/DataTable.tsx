@@ -23,9 +23,6 @@ interface DataTableProps {
   loadingText?: string;
   onEdit: (id: string, action?: string | any, value?: any) => void;
   onDelete?: (id: string) => void;
-  handleSort: (key: string) => void;
-  getSortConfig: (key: string) => any;
-  searchTerm: string;
   emptyStateMessage?: string;
   disableDelete?: boolean;
   hideActionsColumn?: boolean;
@@ -48,9 +45,6 @@ const DataTable: React.FC<DataTableProps> = ({
   loadingText,
   onEdit,
   onDelete,
-  handleSort,
-  getSortConfig,
-  searchTerm,
   emptyStateMessage,
   disableDelete = false,
   hideActionsColumn = false,
@@ -62,8 +56,6 @@ const DataTable: React.FC<DataTableProps> = ({
       <Table>
         <TableHeader
           columns={columns}
-          handleSort={handleSort}
-          getSortConfig={getSortConfig}
           selectedRows={selectedRows}
           totalRowCount={data.length}
           toggleAll={toggleAll}
@@ -93,7 +85,6 @@ const DataTable: React.FC<DataTableProps> = ({
           ) : (
             <EmptyRow 
               columnsCount={columns.length} 
-              searchTerm={searchTerm} 
               isLoading={isLoading}
               emptyStateMessage={emptyStateMessage}
             />

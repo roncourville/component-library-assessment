@@ -14,9 +14,7 @@ export const exampleGridSchema: GridSchema = {
         renderer: "link",
         editor: "text",
         options: { baseUrl: "/items/" }
-      },
-      sortable: true,
-      filterable: true
+      }
     },
     {
       key: "name",
@@ -25,9 +23,7 @@ export const exampleGridSchema: GridSchema = {
       config: {
         renderer: "text",
         editor: "text"
-      },
-      sortable: true,
-      filterable: true
+      }
     },
     {
       key: "plasmid",
@@ -40,8 +36,7 @@ export const exampleGridSchema: GridSchema = {
         options: {
           placeholder: "Select plasmid"
         }
-      },
-      sortable: true
+      }
     },
     {
       key: "volume",
@@ -51,8 +46,7 @@ export const exampleGridSchema: GridSchema = {
         renderer: "number",
         editor: "number",
         options: { unit: "ul" }
-      },
-      sortable: true
+      }
     },
     {
       key: "assignees",
@@ -80,8 +74,7 @@ export const exampleGridSchema: GridSchema = {
       dbField: "edited_by",
       config: {
         renderer: "custom-avatar"
-      },
-      sortable: false
+      }
     }
   ],
   uniqueKey: "id",
