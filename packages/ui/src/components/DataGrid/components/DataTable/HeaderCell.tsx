@@ -27,6 +27,8 @@ const HeaderCell: React.FC<HeaderCellProps> = ({
         {sortConfig?.direction === "asc" && <ArrowUp className="h-4 w-4 text-[#635bff]" />}
         {sortConfig?.direction === "desc" && <ArrowDown className="h-4 w-4 text-[#635bff]" />}
         {sortConfig && <span className="text-xs text-gray-500 ml-1">{sortConfig.priority}</span>}
+        {/* Debug info */}
+        {sortConfig && <span className="text-[10px] ml-1 text-gray-400">({sortConfig.direction})</span>}
       </div>
     </TableHead>
   );

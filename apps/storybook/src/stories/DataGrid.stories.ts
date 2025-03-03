@@ -203,7 +203,8 @@ export const MinimalFeatures: Story = {
     disableDelete: true,
     hideActionsColumn: true,
     enableSearch: false,
-    enableSorting: false
+    enableSorting: false,
+    enablePagination: false
   } 
 };
 

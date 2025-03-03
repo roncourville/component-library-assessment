@@ -36,3 +36,27 @@ export interface GridSchema {
   customRenderers?: Record<string, (props: any) => JSX.Element>; // For dynamically registered renderers
   customEditors?: Record<string, (props: any) => JSX.Element>; // For dynamically registered editors
 }
+
+export interface PaginationOptions {
+  page: number;
+  pageSize: number;
+  totalCount: number;
+  totalPages: number;
+}
+
+export interface DataFetchOptions {
+  page: number;
+  pageSize: number;
+  searchTerm?: string;
+  sortColumn?: string;
+  sortDirection?: 'asc' | 'desc';
+}
+
+export interface DataFetchResult {
+  data: Record<string, any>[];
+  allPrefetchedData?: Record<number, Record<string, any>[]> | null;
+  totalCount: number;
+  totalPages: number;
+  page: number;
+  pageSize: number;
+}

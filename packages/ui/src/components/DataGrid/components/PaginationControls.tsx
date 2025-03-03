@@ -104,6 +104,35 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
     return pageNumbers;
   };
 
+  // Debug info
+  React.useEffect(() => {
+    console.log('PaginationControls render:', { 
+      currentPage, 
+      totalPages, 
+      totalItems,
+      startItem,
+      endItem
+    });
+  }, [currentPage, totalPages, totalItems, startItem, endItem]);
+
+  // Handle next page with debugging
+  const handleNextPage = () => {
+    console.log('Next page button clicked, current page:', currentPage);
+    nextPage();
+  };
+
+  // Handle prev page with debugging
+  const handlePrevPage = () => {
+    console.log('Previous page button clicked, current page:', currentPage);
+    prevPage();
+  };
+
+  // Handle direct page navigation with debugging
+  const handleGoToPage = (page: number) => {
+    console.log('Go to page button clicked, target page:', page);
+    goToPage(page);
+  };
+
   return (
     <div className="flex items-center justify-between py-2">
       <div className="text-sm text-gray-500">
@@ -114,20 +143,31 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
         <Button
           variant="outline"
           size="sm"
-          onClick={prevPage}
+          onClick={handlePrevPage}
           disabled={currentPage === 1}
           className="h-8 w-8 p-0"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
         
-        <div className="flex items-center">{renderPageNumbers()}</div>
+        <div className="flex items-center">
+          {renderPageNumbers().map((btn, index) => {
+            // If it's a button with onClick, replace with our debugged version
+            if (React.isValidElement(btn) && btn.props.onClick) {
+              return React.cloneElement(btn, {
+                onClick: () => handleGoToPage(Number(btn.props.children)),
+                key: btn.key || `page-btn-${index}`
+              });
+            }
+            return btn;
+          })}
+        </div>
         
         <Button
           variant="outline"
           size="sm"
-          onClick={nextPage}
-          disabled={currentPage === totalPages}
+          onClick={handleNextPage}
+          disabled={currentPage === totalPages || totalPages === 0}
           className="h-8 w-8 p-0"
         >
           <ChevronRight className="h-4 w-4" />

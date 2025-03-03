@@ -1,17 +1,31 @@
 "use client"
-import { useState, useEffect } from 'react';
-import { usePlasmids } from './hooks/usePlasmids';
-import { useHandlers } from './hooks/useHandlers';
+import { useEffect } from 'react';
+import { useRowsFetching } from './hooks/useRowsFetching';
 import DataGrid from '@workspace/ui/components/DataGrid';
 import { Toaster } from '@workspace/ui/components/toaster';
 import { gridSchema } from "./schema"
+import { ProjectHeader } from "./components/project-header"
 
 export default function Page() {
-  const { data, setData, isLoading } = usePlasmids();
-  const { handleAdd, handleUpdate, handleDelete } = useHandlers(setData);
+  const { 
+    data, 
+    isLoading, 
+    loadData, 
+    totalCount, 
+    totalPages,
+    handleAdd,
+    handleUpdate,
+    handleDelete
+  } = useRowsFetching();
+
+  // Initialize data load on first render  
+  useEffect(() => {
+    loadData({ page: 1, pageSize: 10 });
+  }, [loadData]);
   
   return (
     <div className="p-4">
+      <ProjectHeader />
       <DataGrid
         data={data}
         onAdd={handleAdd}
@@ -19,9 +33,14 @@ export default function Page() {
         onDelete={handleDelete}
         isLoading={isLoading}
         gridSchema={gridSchema}
+        // Enable server-side pagination
+        serverSidePagination={true}
+        loadData={loadData}
+        totalCount={totalCount}
+        totalPages={totalPages}
+        pageSize={10}
       />
       <Toaster />
-      
     </div>
   );
 }
