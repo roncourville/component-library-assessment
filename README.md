@@ -1,32 +1,59 @@
-# shadcn/ui monorepo template
+# Ron Courville Component Library Technical Assessment
 
-This template is for creating a monorepo with shadcn/ui.
+[![Live Demo](https://img.shields.io/badge/Live-Demo-blue.svg)](https://ron-courville-component-library-assessment.vercel.app)  
+[![Storybook Docs](https://img.shields.io/badge/Storybook-Docs-brightgreen.svg)](https://component-library-assessment-storybook.vercel.app/?path=/story/ui-datagrid--default)
 
-## Usage
+---
 
-```bash
-pnpm dlx shadcn@latest init
-```
+## Overview
 
-## Adding components
+Built with **React**, **TypeScript**, **shadcn**, **Turborepo**, **Next.JS**, **PostgreSQL**, and **Supabase**, this component library provides a pluggable data grid with customizable cell renderers and an API-driven multi-user selection component. The architecture prioritizes scalability and modularity for extensible front-ends.
 
-To add components to your app, run the following command at the root of your `web` app:
+---
 
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
+## Key Features
 
-This will place the ui components in the `packages/ui/src/components` directory.
+### Pluggable Data Grid
+- **Schema Defined via JavaScript Object:** Configure grid structure and behavior with ease.
+- **Custom Cell Renderers:** Register unique View and Edit components.
+- **Efficient Large Data Handling:** Server-side rendering optimizes performance.
+- **Seamless Pagination:** Adjacent page pre-caching and rehydration enable fluid navigation.
+- **Flexible Edit Modes:** Support both row-level and single-cell editing.
+- **Highly Customizable:** Tailor the grid with an extensive feature set.
 
-## Tailwind
+> For more details, see the [DataGrid Component README](https://github.com/roncourville/component-library-assessment/blob/main/packages/ui/src/components/DataGrid/README.md).
 
-Your `tailwind.config.ts` and `globals.css` are already set up to use the components from the `ui` package.
+### Multi-User Selection Component
+- **Addon Integration:** Works seamlessly as part of the pluggable data grid.
+- **Multi-Select with Avatars:** Easily choose multiple users with a visual interface.
+- **Overflow Handling:** Displays a "+1" indicator when selections exceed available space.
+- **Autocomplete Search:** Integrated API search for swift user lookup.
+
+> For more details, see the [UserPicker Component README](https://github.com/roncourville/component-library-assessment/blob/main/packages/ui/src/components/UserPicker/README.md).
+
+---
+
+## System Design
+
+- **Monorepo Architecture:** Powered by Turborepo to share dependencies across projects.
+- **Database Integration:** PostgreSQL persists state with full CRUD operations via Supabase.
+- **Next.JS Demo App:** Implements server-side actions for real-world use cases.
+- **Component Documentation:** Detailed and interactive Storybook documentation.
+
+---
+
+## Installation & Setup
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/roncourville/component-library-assessment.git
+   cd component-library-assessment
 
 ## Using components
 
 To use the components in your app, import them from the `ui` package.
 
 ```tsx
-import { Button } from "@workspace/ui/components/button"
+import DataGrid from "@workspace/ui/components/DataGrid"
 ```
-# do-component-library-assessment
+**Full example usage:** [View Demo](https://github.com/roncourville/component-library-assessment/blob/main/apps/web/app/DataGridExample/index.tsx)
