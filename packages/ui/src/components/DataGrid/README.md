@@ -73,7 +73,6 @@ return (
     gridSchema={gridSchema}
     onUpdate={handleUpdate}
     onDelete={handleDelete}
-    onAdd={handleAdd}
     isLoading={isLoading}
   />
 );
@@ -158,7 +157,6 @@ Each column in the grid schema can have the following configuration:
   data={myData}
   gridSchema={gridSchema}
   disableEditMode={true}
-  disableAddRow={true}
   disableDelete={true}
 />
 ```
@@ -169,7 +167,6 @@ Each column in the grid schema can have the following configuration:
   data={myData}
   gridSchema={gridSchema}
   disableEditMode={true}
-  disableAddRow={true}
   disableDelete={true}
   hideActionsColumn={true}
 />
@@ -185,12 +182,3 @@ Each column in the grid schema can have the following configuration:
 />
 ```
 
-### With Custom Add Button Text
-```tsx
-<DataGrid
-  data={myData}
-  gridSchema={gridSchema}
-  onAdd={handleAdd}
-  addRowButtonText="Add New Item"
-/>
-```
