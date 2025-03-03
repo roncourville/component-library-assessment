@@ -1,5 +1,5 @@
 import { Geist, Geist_Mono } from "next/font/google"
-
+import { Analytics } from "@vercel/analytics/react"
 import "@workspace/ui/styles/globals.css"
 import { ThemeProvider as NextThemesProvider } from "next-themes"
 
