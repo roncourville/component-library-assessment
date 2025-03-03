@@ -21,12 +21,18 @@ export const CustomTagEditor: React.FC<CellComponentProps<string>> = ({ value, o
     "GT-plasmids-10: pAAV-CRISPR",
   ];
   
+  // Print debug info to console
+  console.log("CustomTagEditor rendering with value:", value);
+  
   return (
-    <Select value={value || ''} onValueChange={(newValue) => onChange?.(newValue)}>
+    <Select value={value || ''} onValueChange={(newValue) => {
+      console.log("CustomTagEditor: selected value changed to", newValue);
+      onChange?.(newValue);
+    }}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder={options?.placeholder || "Select option"} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className="select-content">
         {plasmidOptions.map((option: string) => (
           <SelectItem key={option} value={option}>
             {option}

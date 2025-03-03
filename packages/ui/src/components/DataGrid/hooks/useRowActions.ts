@@ -43,11 +43,16 @@ export function useRowActions({ data, gridSchema, onUpdate, disableEditMode = fa
           const changeData = { [key]: updatedData[key] };
           onUpdate?.(rowId, changeData);
           
-          // Find the column to display its name in the toast
+          // Find the column to check if it uses saveEvent='change'
           const column = gridSchema.columns.find(col => col.key === key);
-          toast({
-            title: column ? `${column.header} updated` : "Field updated",
-          });
+          
+          // Only show toast for fields that don't use saveEvent='change'
+          // This prevents duplicate toasts since 'change' fields show a toast in handleCellChange
+          if (column?.config.saveEvent !== 'change') {
+            toast({
+              title: column ? `${column.header} updated` : "Field updated",
+            });
+          }
         }
       }
     }
@@ -107,6 +112,7 @@ export function useRowActions({ data, gridSchema, onUpdate, disableEditMode = fa
   const handleCellChange = useCallback((rowId: string, key: string, value: any) => {
     console.log(`DataGrid.handleCellChange: rowId=${rowId}, key=${key}, value=`, value);
     
+    // First update the local edit state
     setRowEdits((prev) => ({
       ...prev,
       [rowId]: {
@@ -119,8 +125,13 @@ export function useRowActions({ data, gridSchema, onUpdate, disableEditMode = fa
     const column = gridSchema.columns.find((col) => col.key === key);
     console.log(`DataGrid.handleCellChange: column saveEvent=${column?.config.saveEvent}`);
     
-    // Check if this field should save on change
-    if (column?.config.saveEvent === 'change') {
+    // Check if user is in row edit mode
+    const isInRowEditMode = editingRows.has(rowId);
+    
+    // Only auto-save changes if:
+    // 1. We're in cell edit mode (not row edit mode)
+    // 2. This field should save on change
+    if (!isInRowEditMode && column?.config.saveEvent === 'change') {
       console.log(`DataGrid.handleCellChange: Processing saveEvent=change for column ${key}`);
       
       const originalRow = data.find((row) => row.id === rowId);
@@ -128,16 +139,10 @@ export function useRowActions({ data, gridSchema, onUpdate, disableEditMode = fa
       
       console.log(`DataGrid.handleCellChange: Original value=`, originalRow?.[key], `New value=`, updatedValue);
       
-      // Always update for tag and user fields
-      const renderer = column.config.renderer;
-      const isTagOrUser = 
-        (typeof renderer === 'string' && (renderer === 'tag' || renderer === 'user')) ||
-        (typeof renderer !== 'string' && (renderer.name === 'TagRenderer' || renderer.name === 'UserRenderer'));
-      
       // Check if value has changed
       const valueChanged = originalRow && JSON.stringify(updatedValue) !== JSON.stringify(originalRow[key]);
       
-      if (isTagOrUser || valueChanged) {
+      if (valueChanged) {
         console.log(`DataGrid.handleCellChange: Saving change for ${column.header}`);
         
         // For immediate fields, send just the changed field to the update handler
@@ -145,17 +150,31 @@ export function useRowActions({ data, gridSchema, onUpdate, disableEditMode = fa
         
         if (onUpdate) {
           onUpdate(rowId, changeData);
+          // Show toast only for fields that save on change to prevent duplicate toasts
+          // The saveCurrentEdit will show a toast for other fields
           toast({
             title: `${column.header} updated`,
           });
+          
+          // Exit edit mode after saving
+          if (editingCell?.rowId === rowId && editingCell?.key === key) {
+            setEditingCell(null);
+          }
         } else {
           console.error("DataGrid.handleCellChange: onUpdate callback is undefined");
         }
       } else {
         console.log(`DataGrid.handleCellChange: No change detected for ${column.header}`);
+        
+        // Exit edit mode even if no change was made
+        if (editingCell?.rowId === rowId && editingCell?.key === key) {
+          setEditingCell(null);
+        }
       }
+    } else if (isInRowEditMode) {
+      console.log(`DataGrid.handleCellChange: In row edit mode - changes will be saved when Save button is clicked`);
     }
-  }, [data, gridSchema.columns, onUpdate]);
+  }, [data, gridSchema.columns, onUpdate, editingCell, setEditingCell, editingRows]);
 
   const handleCellBlur = useCallback((rowId: string, columnKey: string) => {
     // Only proceed if we're editing a single cell (not a whole row)

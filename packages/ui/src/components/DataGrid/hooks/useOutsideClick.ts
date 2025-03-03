@@ -27,7 +27,10 @@ export function useOutsideClick({
       if (cellRef.current && !cellRef.current.contains(target)) {
         // Check if the click is on a related element like a dropdown
         // This prevents exiting edit mode when interacting with dropdowns or dialog elements
-        const isRelatedElement = document.querySelector('.select-content')?.contains(target) ||
+        const isRelatedElement = 
+          // Add all possible dropdown/select content containers
+          document.querySelector('.select-content')?.contains(target) ||
+          document.querySelector('[role="listbox"]')?.contains(target) || // Radix UI select role
           document.querySelector('.popover-content')?.contains(target) ||
           document.querySelector('.command')?.contains(target);
           
@@ -39,31 +42,22 @@ export function useOutsideClick({
         // Get the column type of the cell being edited
         const column = gridSchema.columns.find(col => col.key === editingCell.key);
         
-        // Check if this field should save on change instead of blur
-        if (column?.config.saveEvent === 'change') {
-          // For fields that save on change, just exit edit mode without saving again
-          setEditingCell(null);
-          return;
-        }
-        
         // For backward compatibility - check persistCellEditOnBlur flag
         if (column?.config.persistCellEditOnBlur) {
           // Don't exit edit mode or save on outside click
           return;
         }
         
-        // For backward compatibility, check renderer types
-        const renderer = column?.config.renderer;
-        const isTagOrUser = 
-          (typeof renderer === 'string' && (renderer === 'tag' || renderer === 'user')) ||
-          (typeof renderer !== 'string' && (renderer.name === 'TagRenderer' || renderer.name === 'UserRenderer'));
-          
-        // For standard fields, save on click outside
-        if (!isTagOrUser) {
+        // If the field is not a saveEvent='change' field, we need to save it on outside click
+        // because these fields save their values when clicking outside
+        if (column?.config.saveEvent !== 'change') {
+          // Save the current edit
           saveCurrentEdit(editingCell.rowId, editingCell.key);
-        }
+        } 
+        // For fields with saveEvent='change', they've already saved their value
+        // when the value changed, so we don't need to save again
         
-        // Exit edit mode for any field type when clicking outside (unless configured not to)
+        // Exit edit mode
         setEditingCell(null);
       }
     }
