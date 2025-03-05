@@ -47,6 +47,7 @@ export interface DataFetchOptions {
   pageSize: number;
   prefetchAdjacentPages?: boolean;
   forceRefresh?: boolean; // Flag to force data refresh even if the page is cached
+  searchTerm?: string; // Optional search term for filtering data
 }
 
 export interface DataFetchResult {

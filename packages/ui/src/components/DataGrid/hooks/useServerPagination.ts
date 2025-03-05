@@ -31,6 +31,7 @@ export function useServerPagination({
   const [internalTotalPages, setInternalTotalPages] = useState<number>(externalTotalPages || Math.ceil(data.length / pageSize));
   const [internalIsLoading, setInternalIsLoading] = useState<boolean>(externalIsLoading || false);
   const [internalCurrentPage, setInternalCurrentPage] = useState<number>(1);
+  const [searchTerm, setSearchTerm] = useState<string>('');
   
   // Cache for prefetched pages
   const {
@@ -52,10 +53,22 @@ export function useServerPagination({
       const requestedPage = options.page;
       const isCached = cachedPages[requestedPage] && cachedPages[requestedPage].length > 0;
       const forceRefresh = options.forceRefresh || false;
+      const optionsSearchTerm = options.searchTerm !== undefined ? options.searchTerm : searchTerm;
       
+      // Always use the most current search term
+      if (options.searchTerm === undefined && searchTerm) {
+        options.searchTerm = searchTerm;
+      }
+
+      // Log before deciding whether to use cache
+      console.log(`fetchData: page=${requestedPage}, cached=${isCached}, forceRefresh=${forceRefresh}, searchTerm=${options.searchTerm}`);
       logCacheState();
       
-      if (isCached && !forceRefresh) {
+      // Only use cache if not a forced refresh AND search term matches current state
+      // This ensures we don't use cached results from a different search
+      if (isCached && !forceRefresh && optionsSearchTerm === searchTerm) {
+        console.log(`Using cached data for page ${requestedPage} with search term "${searchTerm}"`);
+        
         // Use the cached data without showing loading state
         setInternalData(cachedPages[requestedPage]);
         setInternalCurrentPage(requestedPage);
@@ -126,7 +139,13 @@ export function useServerPagination({
         onDataFetched(cachedPages[page], page);
       }
       
-      // Check if we need to prefetch the surrounding pages
+      // Check if we need to prefetch the surrounding pages - SKIP prefetching if in search mode
+      if (searchTerm) {
+        console.log(`Skipping prefetch for search results with term "${searchTerm}"`);
+        return; // Don't prefetch when searching
+      }
+      
+      // For regular pagination (no search), prefetch surrounding pages
       const surroundingPages = [page - 2, page - 1, page + 1, page + 2].filter(p => p > 0);
       const needPrefetch = surroundingPages.some(pageNum => {
         if (pageNum > internalTotalPages) return false;
@@ -134,10 +153,13 @@ export function useServerPagination({
       });
       
       if (needPrefetch) {
+        console.log(`Prefetching pages around ${page}`);
+        
         // Fetch surrounding pages in the background without loading state
         loadData({
           page, // Use current page as center for prefetching window
-          pageSize
+          pageSize, 
+          searchTerm // Include current search term to maintain consistency
         }).then(result => {
           if (result.allPrefetchedData) {
             setCachedPages(prevCache => {
@@ -164,14 +186,16 @@ export function useServerPagination({
       // Update internal page state first
       setInternalCurrentPage(page);
       
-      // Fetch the requested page and prefetch next pages
+      // Fetch the requested page 
       fetchData({
         page,
-        pageSize
+        pageSize,
+        searchTerm, // Include current search term
+        prefetchAdjacentPages: !searchTerm // Only prefetch if not in search mode
       });
     }
   }, [fetchData, pageSize, loadData, serverSidePagination, internalTotalPages, 
-      cachedPages, setCachedPages, prioritizeCachePages, onDataFetched]);
+      cachedPages, setCachedPages, prioritizeCachePages, onDataFetched, searchTerm]);
   
   // Handle next page for server pagination
   const serverNextPage = useCallback(() => {
@@ -190,12 +214,61 @@ export function useServerPagination({
   // Initialize data fetching on mount
   useEffect(() => {
     if (serverSidePagination && loadData) {
+      console.log("Initial data fetch on mount");
       fetchData({
         page: 1,
-        pageSize
+        pageSize,
+        searchTerm: '', // Start with empty search
+        prefetchAdjacentPages: true // Enable prefetching for initial load
       });
     }
-  }, [serverSidePagination, loadData, fetchData, pageSize]);
+  }, [serverSidePagination, loadData]); // Only run on mount and when these core dependencies change
+  
+  // Handle searching
+  const handleSearch = useCallback((term: string) => {
+    // Only proceed if the term is different
+    if (term === searchTerm) return;
+    
+    console.log(`Search changed from "${searchTerm}" to "${term}"`);
+    
+    // Reset to first page when searching
+    if (loadData) {
+      // Before fetching, indicate loading
+      setInternalIsLoading(true);
+      
+      // Clear cache when search term changes
+      setCachedPages({});
+      
+      // Update search term state - AFTER we've checked against the previous value
+      setSearchTerm(term);
+      
+      // Reset to page 1
+      setInternalCurrentPage(1);
+      
+      try {
+        // Directly call loadData to avoid any recursive loops through fetchData
+        loadData({
+          page: 1,
+          pageSize,
+          searchTerm: term,
+          forceRefresh: true,
+          prefetchAdjacentPages: false // Disable prefetching for search to simplify results
+        }).then(result => {
+          // Update data from the search results
+          setInternalData(result.data);
+          setInternalTotalCount(result.totalCount);
+          setInternalTotalPages(result.totalPages);
+          setInternalIsLoading(false);
+        }).catch(err => {
+          console.error("Search error:", err);
+          setInternalIsLoading(false);
+        });
+      } catch (error) {
+        console.error("Error during search:", error);
+        setInternalIsLoading(false);
+      }
+    }
+  }, [pageSize, loadData, setCachedPages, searchTerm]);
 
   return {
     internalData,
@@ -207,6 +280,8 @@ export function useServerPagination({
     fetchData,
     serverGoToPage,
     serverNextPage,
-    serverPrevPage
+    serverPrevPage,
+    searchTerm,
+    handleSearch
   };
 }

@@ -54,8 +54,9 @@ export function ProjectHeader() {
                                     <li>Custom cell View and Edit components registration.</li>
                                     <li>Efficient handling of large data sets with server side rendering.</li>
                                     <li>Seamless page navigation with adjacent page pre-caching and rehydration.</li>
+                                    <li>Integrated search functionality for quick content filtering.</li>
                                     <li>Edit modes supported at row and single cell scoped operations.</li>
-                                    <li>Higly customizable feature set options.</li>
+                                    <li>Highly customizable feature set options.</li>
                                 </ul>
                             </div>
 

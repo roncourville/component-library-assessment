@@ -18,6 +18,7 @@ Built with **React**, **TypeScript**, **shadcn**, **Turborepo**, **Next.JS**, **
 - **Custom Cell Renderers:** Register unique View and Edit components.
 - **Efficient Large Data Handling:** Server-side rendering optimizes performance.
 - **Seamless Pagination:** Adjacent page pre-caching and rehydration enable fluid navigation.
+- **Built-in Search:** Find content quickly with integrated search functionality.
 - **Flexible Edit Modes:** Support both row-level and single-cell editing.
 - **Highly Customizable:** Tailor the grid with an extensive feature set.
 

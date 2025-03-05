@@ -217,4 +217,6 @@ export const EmptyState: Story = { args: { data: [], emptyStateMessage: 'No plas
 
 export const WithPagination: Story = { args: { pageSize: 2, enablePagination: true } };
 
-export const WithAllFeatures: Story = { args: { enablePagination: true, pageSize: 3 } };
+export const WithoutSearch: Story = { args: { enableSearch: false, serverSidePagination: true } };
+
+export const WithAllFeatures: Story = { args: { enablePagination: true, enableSearch: true, pageSize: 3 } };

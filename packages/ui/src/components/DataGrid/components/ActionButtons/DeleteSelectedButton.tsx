@@ -8,13 +8,17 @@ interface DeleteSelectedButtonProps {
   onDelete?: (id: string) => void;
   isLoading?: boolean;
   disableDelete?: boolean;
+  onRefreshData?: () => void; // For refreshing data
+  setSelectedRows?: (rows: Set<string>) => void; // For clearing selection
 }
 
 const DeleteSelectedButton: React.FC<DeleteSelectedButtonProps> = ({ 
   selectedRows, 
   onDelete,
   isLoading = false,
-  disableDelete = false
+  disableDelete = false,
+  onRefreshData,
+  setSelectedRows
 }) => {
   const handleDeleteSelected = () => {
     // Delete all selected rows
@@ -26,6 +30,18 @@ const DeleteSelectedButton: React.FC<DeleteSelectedButtonProps> = ({
     toast({
       title: selectedRows.size > 1 ? "Rows deleted" : "Row deleted",
     });
+    
+    // Clear selected rows after deletion
+    if (setSelectedRows) {
+      setSelectedRows(new Set());
+    }
+    
+    // Refresh data after deletion is complete
+    setTimeout(() => {
+      if (onRefreshData) {
+        onRefreshData();
+      }
+    }, 300); // Slightly longer timeout to ensure all deletions are processed
   };
 
   if (selectedRows.size === 0 || disableDelete || !onDelete) {

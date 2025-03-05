@@ -7,6 +7,7 @@ A flexible data grid component with support for pagination and inline editing. T
 - Inline cell editing
 - Row editing
 - Pagination
+- Search functionality
 - Checkbox selection
 - Custom cell renderers and editors
 - Loading animations
@@ -87,7 +88,8 @@ return (
 | isLoading           | boolean                                     | false             | Whether the grid is in a loading state                 |
 | loadingText         | string                                      | "Loading data..." | Text to display in the loading overlay                 |
 | emptyStateMessage   | string                                      | "No data available." | Message to display when there is no data             |
-| enablePagination    | boolean                                     | false             | Whether to enable pagination                           |
+| enablePagination    | boolean                                     | true              | Whether to enable pagination                           |
+| enableSearch        | boolean                                     | true              | Whether to enable search functionality                  |
 | pageSize            | number                                      | 10                | Number of items per page when pagination is enabled    |
 | disableEditMode     | boolean                                     | false             | Disable all cell and row editing (view-only mode)      |
 | disableDelete       | boolean                                     | false             | Disable row deletion                                   |
@@ -179,6 +181,28 @@ Each column in the grid schema can have the following configuration:
   gridSchema={gridSchema}
   enablePagination={true}
   pageSize={5}
+/>
+```
+
+### With Search Disabled
+```tsx
+<DataGrid
+  data={myData}
+  gridSchema={gridSchema}
+  enableSearch={false}
+  serverSidePagination={true}
+/>
+```
+
+### With All Features
+```tsx
+<DataGrid
+  data={myData}
+  gridSchema={gridSchema}
+  enablePagination={true}
+  enableSearch={true}
+  pageSize={5}
+  serverSidePagination={true}
 />
 ```
 

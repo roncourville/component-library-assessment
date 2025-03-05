@@ -13,7 +13,7 @@ export function useRowsFetching() {
   // Server-side data loading function
   const loadData = useCallback(async (options: DataFetchOptions): Promise<DataFetchResult> => {
     setIsLoading(true);
-    
+
     try {
       console.log('useRowsFetching.loadData called with options:', options);
       const result = await fetchRows(options);
@@ -46,33 +46,6 @@ export function useRowsFetching() {
     }
   }, []);
   
-  // Handle row addition with refetch
-  const handleAdd = useCallback(async (newPlasmid: Plasmid) => {
-    setIsLoading(true);
-    try {
-      await addPlasmid(newPlasmid);
-      // Refetch data to get the updated list (disable prefetching on CRUD operations to refresh cache)
-      await loadData({ 
-        page: 1, 
-        pageSize: 10,
-        prefetchAdjacentPages: false, // Force a complete refresh after adding
-        forceRefresh: true  // Force a refresh of all cached data
-      });
-      toast({
-        title: "Success",
-        description: "Plasmid added successfully",
-      });
-    } catch (error) {
-      console.error("Error adding plasmid:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add plasmid",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  }, [loadData]);
   
   // Handle row update with refetch
   const handleUpdate = useCallback(async (id: string, updatedData: Record<string, any>) => {
@@ -137,7 +110,6 @@ export function useRowsFetching() {
     loadData, 
     totalCount, 
     totalPages,
-    handleAdd,
     handleUpdate,
     handleDelete
   };

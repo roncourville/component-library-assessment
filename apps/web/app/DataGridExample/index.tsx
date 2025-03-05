@@ -13,14 +13,14 @@ export default function Page() {
     loadData, 
     totalCount, 
     totalPages,
-    handleAdd,
     handleUpdate,
     handleDelete
   } = useRowsFetching();
 
-  // Initialize data load on first render  
+  const pageSize = 10;
+
   useEffect(() => {
-    loadData({ page: 1, pageSize: 10 });
+    loadData({ page: 1, pageSize: pageSize });
   }, [loadData]);
   
   return (
@@ -28,7 +28,6 @@ export default function Page() {
       <ProjectHeader />
       <DataGrid
         data={data}
-        onAdd={handleAdd}
         onUpdate={handleUpdate}
         onDelete={handleDelete}
         isLoading={isLoading}
@@ -38,7 +37,7 @@ export default function Page() {
         loadData={loadData}
         totalCount={totalCount}
         totalPages={totalPages}
-        pageSize={10}
+        pageSize={pageSize}
       />
       <Toaster />
     </div>

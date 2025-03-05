@@ -3,7 +3,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { DataFetchOptions, DataFetchResult, GridSchema } from "./types";
 import { useRowActions, useDataFiltering, useOutsideClick } from './hooks';
-import { DataTable, DeleteSelectedButton, PaginationControls, CacheStatus } from './components/UIComponents';
+import { DataTable, DeleteSelectedButton, PaginationControls, CacheStatus, SearchInput } from './components/UIComponents';
 // Import hooks used in this component
 import { useServerPagination } from './hooks/useServerPagination';
 
@@ -21,6 +21,7 @@ interface DataGridProps {
   loadingText?: string;
   emptyStateMessage?: string;
   enablePagination?: boolean;
+  enableSearch?: boolean;
   pageSize?: number;
   disableEditMode?: boolean;
   disableDelete?: boolean;
@@ -41,6 +42,7 @@ export default function DataGrid({
   loadingText,
   emptyStateMessage = "No data available.",
   enablePagination = true,
+  enableSearch = true,
   pageSize = 10,
   disableEditMode = false,
   disableDelete = false,
@@ -66,7 +68,9 @@ export default function DataGrid({
     fetchData,
     serverGoToPage,
     serverNextPage,
-    serverPrevPage
+    serverPrevPage,
+    searchTerm,
+    handleSearch
   } = useServerPagination({
     data,
     externalIsLoading,
@@ -84,6 +88,7 @@ export default function DataGrid({
   // Set up row actions for editing, selecting, etc.
   const {
     selectedRows,
+    setSelectedRows,
     editingRows,
     editingCell,
     rowEdits,
@@ -186,7 +191,18 @@ export default function DataGrid({
   return (
     <div className="space-y-4" ref={cellRef}>
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="w-1/3">
+          {serverSidePagination && enableSearch && (
+            <SearchInput
+              onSearch={handleSearch}
+              initialValue={searchTerm}
+              placeholder="Search rows..."
+              className="max-w-xs"
+            />
+          )}
+        </div>
+
+        <div className="flex items-center gap-2 justify-end w-2/3">
           {serverSidePagination && (
             <CacheStatus 
               cachedPages={cachedPages} 
@@ -194,14 +210,22 @@ export default function DataGrid({
               totalPages={internalTotalPages} 
             />
           )}
-        </div>
-
-        <div className="flex gap-2">
+          
           <DeleteSelectedButton
             selectedRows={selectedRows}
             onDelete={onDelete}
             isLoading={isLoading}
             disableDelete={disableDelete}
+            setSelectedRows={setSelectedRows}
+            onRefreshData={() => {
+              if (serverSidePagination && loadData) {
+                fetchData({
+                  page: internalCurrentPage,
+                  pageSize,
+                  forceRefresh: true // Force refresh to bypass cache after deletion
+                });
+              }
+            }}
           />
         </div>
       </div>

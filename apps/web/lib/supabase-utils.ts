@@ -1,5 +1,6 @@
 import { supabase } from "./supabase"
 import { gridSchema } from "../app/DataGridExample/schema"
+import { SupabaseClient } from "@supabase/supabase-js"
 
 // Helper function to map data from UI format to Supabase format
 export function mapToSupabaseFormat(data: Record<string, any>): Record<string, any> {
@@ -43,11 +44,14 @@ export async function fetchRows(options?: {
   page?: number; 
   pageSize?: number; 
   prefetchAdjacentPages?: boolean;
+  searchTerm?: string;
+  forceRefresh?: boolean;
 }) {
   const { 
     page = 1, 
     pageSize = 10,
-    prefetchAdjacentPages = true
+    prefetchAdjacentPages = true,
+    searchTerm = ''
   } = options || {};
 
   // Calculate offset for pagination
@@ -77,13 +81,33 @@ export async function fetchRows(options?: {
   
   console.log(`Fetching data with prefetch=${prefetchAdjacentPages}, range: offset=${offset}, limit=${fetchPageSize}`);
   
-  // First, get the total count
-  const countQuery = supabase.from("plasmids").select('id', { count: 'exact', head: true });
+  // Log search term if provided
+  if (searchTerm) {
+    console.log(`Applying search filter: "${searchTerm}"`);
+  }
   
-  // Build the data query with pagination
-  let query = supabase.from("plasmids").select("*");
+  // First, create a base query function to ensure we apply filters consistently
+  function applySearchFilters(queryBuilder) {
+    let filtered = queryBuilder;
+    
+    if (searchTerm) {
+      const numberSearchTerm = parseFloat(searchTerm);
+      let searchStr = `plasmid_name.ilike.%${searchTerm}%,storage_location.ilike.%${searchTerm}%`;
+      searchStr = isNaN(numberSearchTerm) ? searchStr : searchStr + `,length_bp.eq.${numberSearchTerm},volume_ul.eq.${numberSearchTerm}`;
+      searchStr += `,assignees_text.ilike.%${searchTerm}%`;
+      filtered = filtered.or(searchStr);
+    }
+    
+    return filtered;
+  }
   
-  // Add pagination with the adjusted range if prefetching
+  // Create the count query with consistent filters
+  const countQuery = applySearchFilters(supabase.from("plasmids").select('*', { count: 'exact', head: true }));
+  
+  // Create the data query with the exact same filters
+  let query = applySearchFilters(supabase.from("plasmids").select('*'));
+  
+  // Apply proper pagination using range with start and end indices
   query = query.range(offset, offset + fetchPageSize - 1);
   
   try {
@@ -104,21 +128,25 @@ export async function fetchRows(options?: {
       throw dataResult.error;
     }
     
-    const totalCount = countResult.count || 0;
+    // Log the full count result to help debug
+    console.log('Count query result:', countResult);
+    
+    const totalCount = countResult.count ?? 0;
     const totalPages = Math.ceil(totalCount / pageSize);
     
     console.log('fetchRows result:', {
-      dataCount: dataResult.data.length,
+      dataCount: dataResult?.data?.length,
       totalCount,
       page,
       pageSize,
       totalPages,
       offset,
-      prefetchAdjacentPages
+      prefetchAdjacentPages,
+      searchTerm: searchTerm || 'none'
     });
     
     // Map all data to UI format
-    const allFetchedData = dataResult.data.map(mapFromSupabaseFormat);
+    const allFetchedData = dataResult?.data?.map(mapFromSupabaseFormat);
     
     // If we're prefetching, organize the data by page
     let paginatedData: Record<number, Record<string, any>[]> = {};
@@ -143,9 +171,9 @@ export async function fetchRows(options?: {
         const endIndex = startIndex + pageSize;
         
         // Check if we have enough data for this page
-        if (startIndex < allFetchedData.length) {
+        if (startIndex < allFetchedData?.length) {
           paginatedData[pageNum] = allFetchedData.slice(startIndex, endIndex);
-          console.log(`Cached page ${pageNum}: ${paginatedData[pageNum].length} items`);
+          console.log(`Cached page ${pageNum}: ${paginatedData[pageNum]?.length} items`);
         }
       }
       
@@ -155,7 +183,7 @@ export async function fetchRows(options?: {
       }
       
       console.log('Organized prefetched data by page:', 
-        Object.keys(paginatedData).map(p => `Page ${p}: ${paginatedData[Number(p)].length} items`));
+        Object.keys(paginatedData).map(p => `Page ${p}: ${paginatedData[Number(p)]?.length} items`));
     }
   
     return {

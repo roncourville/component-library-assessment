@@ -6,26 +6,6 @@ import type { Plasmid } from '../../types/data.types';
 export function useHandlers(setData: React.Dispatch<React.SetStateAction<Plasmid[]>>) {
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAdd = async (newData: any) => {
-    setIsLoading(true);
-    try {
-      const addedPlasmid = await addPlasmid(newData);
-      setData((currentData) => [...currentData, addedPlasmid as Plasmid]);
-      toast({
-        title: "Row added",
-      });
-    } catch (error) {
-      console.error("Error adding plasmid:", error);
-      toast({
-        title: "Error",
-        description: "Failed to add plasmid",
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleUpdate = async (rowId: string, updatedData: any) => {
     setIsLoading(true);
     try {
@@ -66,5 +46,5 @@ export function useHandlers(setData: React.Dispatch<React.SetStateAction<Plasmid
     }
   };
 
-  return { handleAdd, handleUpdate, handleDelete, isLoading };
+  return { handleUpdate, handleDelete, isLoading };
 }
